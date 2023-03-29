@@ -18,3 +18,33 @@
     height:40vh;
     top:80vh;
 }
+
+#base {
+    width:420px;
+    height: 100px;
+    position:absolute;
+    top: -100px;
+    left: 50%;
+    margin-left: -200px;
+}
+
+.child {
+    width: 100px;
+    height:100%;
+    display:inline-block;
+    border: red 3px;
+    background-color: yellow;
+}
+
+@media only screen and (max-width: 768px) {
+    #base {
+        width:140px;
+        height: 30px;
+        top:-30px;
+        margin-left: -70px;
+    }
+
+    .child {
+        width: 30px;
+    }
+}

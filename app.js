@@ -22,3 +22,18 @@ let interval = window.setInterval(function() {
         }
     }
 }, 50);
+
+//retrieve the width of the base div
+
+let base = document.getElementById('base');
+let divWidth = getComputedStyle(base).width;
+
+if(divWidth.length == 5) {
+    divWidth = divWidth.substring(0, 3);
+}
+else {
+    divWidth = divWidth.substring(0,2);
+}
+
+divWidth = Number(divWidth);
+
