@@ -48,3 +48,19 @@
         width: 30px;
     }
 }
+
+#left-border {
+    position:absolute;
+    left:0;
+    top:0;
+    height: 80vh;
+    background-color: rgb(193, 231, 193);
+}
+
+#right-border {
+    position:absolute;
+    right:0;
+    top:0;
+    height: 80vh;
+    background-color: rgb(193, 231, 193);
+}

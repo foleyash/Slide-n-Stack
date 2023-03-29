@@ -25,15 +25,78 @@ let interval = window.setInterval(function() {
 
 //retrieve the width of the base div
 
-let base = document.getElementById('base');
-let divWidth = getComputedStyle(base).width;
+let baseWidth = getBaseWidth();
 
-if(divWidth.length == 5) {
-    divWidth = divWidth.substring(0, 3);
+//retrieve the width of child block
+
+let childWidth = getChildWidth();
+
+//use width of window to set side borders
+
+setBorders();
+
+window.onresize = () => {
+    setBorders();
 }
-else {
-    divWidth = divWidth.substring(0,2);
+
+
+//FUNCTION DEFINITION BELOW ****
+
+function getWindowWidth() {
+    return window.innerWidth;
 }
 
-divWidth = Number(divWidth);
+function getBaseWidth() {
+    let base = document.getElementById('base');
+    let divWidth = getComputedStyle(base).width;
 
+    if(divWidth.length == 5) {
+        divWidth = divWidth.substring(0, 3);
+    }
+    else {
+        divWidth = divWidth.substring(0,2);
+    }
+
+    let width = Number(divWidth);
+
+    return width;
+}
+
+function getChildWidth() {
+    let childrenBlocks = document.getElementsByClassName("child");
+    let childWidth = getComputedStyle(childrenBlocks[0]).width;
+
+    if(childWidth.length == 5) {
+        childWidth = childWidth.substring(0, 3);
+    }
+    else {
+        childWidth = childWidth.substring(0,2);
+    }
+
+    let width = Number(childWidth);
+
+    return width;
+}
+
+function blocksInWindow() {
+    let blocks = 0;
+    let width = 0;
+    while(width < getWindowWidth() - getChildWidth()) {
+        blocks++;
+        width = width + getChildWidth();
+    }
+
+    return blocks;
+}
+
+function setBorders() {
+    let blocks = blocksInWindow();
+    let width = blocks * getChildWidth();
+
+    let borderWidth = getWindowWidth() - width;
+    
+    let leftBorder = document.getElementById("left-border");
+    let rightBorder = document.getElementById("right-border");
+    leftBorder.style.width = borderWidth + "px";
+    rightBorder.style.width = borderWidth + "px";
+}
