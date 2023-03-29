@@ -34,16 +34,19 @@ let childWidth = getChildWidth();
 //use width of window to set side borders
 
 setBorders();
+setTestBlocks();
+fillTestBlocks();
 
 window.onresize = () => {
     setBorders();
+    setTestBlocks();
+    fillTestBlocks();
 }
-
 
 //FUNCTION DEFINITION BELOW ****
 
 function getWindowWidth() {
-    return window.innerWidth;
+    return document.body.clientWidth;
 }
 
 function getBaseWidth() {
@@ -81,22 +84,55 @@ function getChildWidth() {
 function blocksInWindow() {
     let blocks = 0;
     let width = 0;
-    while(width < getWindowWidth() - getChildWidth()) {
+    while(width < (getWindowWidth()/2) - 2 * getChildWidth()) {
         blocks++;
         width = width + getChildWidth();
     }
 
-    return blocks;
+    return blocks + 4;
 }
 
 function setBorders() {
     let blocks = blocksInWindow();
     let width = blocks * getChildWidth();
 
-    let borderWidth = getWindowWidth() - width;
+    let borderWidth = (getWindowWidth() - width) / 2;
     
     let leftBorder = document.getElementById("left-border");
     let rightBorder = document.getElementById("right-border");
     leftBorder.style.width = borderWidth + "px";
     rightBorder.style.width = borderWidth + "px";
+}
+
+function setTestBlocks() {
+    let testBlocks = document.getElementById("test-blocks");
+    let blocks = blocksInWindow();
+    let width = blocks * getChildWidth();
+    let borderWidth = (getWindowWidth() - width) / 2;
+    console.log("Blocks: " + blocks);
+    console.log("Div width: " + width);
+    console.log("borderWidth: " + borderWidth);
+    console.log("Window width: " + document.body.clientWidth);
+    
+    testBlocks.style.height = getChildWidth() + "px";
+    testBlocks.style.width = width + "px";
+    testBlocks.style.left = borderWidth + "px";
+}
+
+function fillTestBlocks() {
+
+    let testBlocks = document.getElementById("test-blocks");
+    let blocks = blocksInWindow();
+
+    if(testBlocks.hasChildNodes()) {
+        while(testBlocks.firstChild) {
+            testBlocks.removeChild(testBlocks.lastChild);
+        }
+    }
+    
+    for(let i = 0; i < blocks; i++) {
+        let div = document.createElement('div');
+        div.classList.add('child');
+        testBlocks.appendChild(div);
+    }
 }
