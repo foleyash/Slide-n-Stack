@@ -11,12 +11,21 @@
     height:120vh;
 }
 
+#nav-bar {
+    background-color: blue;
+    position:absolute;
+    width: 100%;
+    height:15vh;
+    top:0;
+    left:0;
+}
+
 #game-floor {
-    background-image: linear-gradient(red, orange 50%, yellow 80%);
+    background-image: linear-gradient(red, orange 40%, yellow 80%);
     position: absolute;
     width:100%;
-    height:40vh;
-    top:80vh;
+    height:35vh;
+    top:85vh;
 }
 
 #base {
@@ -28,6 +37,13 @@
     margin-left: -200px;
 }
 
+#first-platform {
+    width: 300px;
+    height:100px;
+    position:absolute;
+    top: -200px;
+}
+
 .child {
     width: 100px;
     height:100%;
@@ -36,12 +52,25 @@
     background-color: yellow;
 }
 
+@media only screen and (max-width: 1256px) {
+    #base {
+        width:240px;
+        height: 60px;
+        top:-60px;
+        margin-left: -120px;
+    }
+
+    .child {
+        width: 60px;
+    }
+}
+
 @media only screen and (max-width: 768px) {
     #base {
-        width:140px;
+        width:120px;
         height: 30px;
         top:-30px;
-        margin-left: -70px;
+        margin-left: -60px;
     }
 
     .child {
@@ -53,7 +82,7 @@
     position:absolute;
     left:0;
     top:0;
-    height: 80vh;
+    height: 85vh;
     background-color: rgb(199, 73, 73);
 }
 
@@ -61,7 +90,7 @@
     position:absolute;
     right:0;
     top:0;
-    height: 80vh;
+    height: 85vh;
     background-color: rgb(199, 73, 73);
 }
 
