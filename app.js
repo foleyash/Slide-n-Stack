@@ -1,10 +1,12 @@
 let floor = document.getElementById("game-floor");
+let pauseButton = document.getElementById("pause");
 let wave_up = true;
 let wave_size = 0;
 var blocksLeft = 3;
 var height = 2;
 var platforms = [];
 var moveRight = true;
+var paused = false;
 
 let interval = window.setInterval(function() {
     if(wave_up) {
@@ -39,12 +41,19 @@ let childWidth = getChildWidth();
 
 setBorders();
 setPlatform();
-//movePlatform();
+var moveInterval = window.setInterval(movePlatform, 200);
 
 window.onresize = () => {
     setBorders();
     resizePlatforms();
+    pause();
 }
+
+pauseButton.addEventListener("click", () => {
+    
+    !paused ? pause() : unpause();
+    
+}); 
 
 //FUNCTION DEFINITION BELOW ****
 
@@ -150,46 +159,64 @@ function resizePlatforms() {
 }
 
 function movePlatform() {
-    var moveInterval = window.setInterval(() => {
+
         let pos = px2num(platforms[platforms.length - 1].style.left);
-        if(pos + 4 * getChildWidth() <= (getWindowWidth() - getBorderWidth()) && moveRight) {
+        let blockWidth = getChildWidth();
+        let windowWidth = getWindowWidth();
+        let borderWidth = getBorderWidth();
+        console.log(pos);
+        if(pos + 4 * blockWidth <= (windowWidth - borderWidth) && moveRight) {
             //continue moving right
-            platforms[platforms.length - 1].style.left = (pos + getChildWidth()) + "px";
+            platforms[platforms.length - 1].style.left = (pos + blockWidth) + "px";
             console.log("Continue moving right");
+            console.log("Border-width: " + borderWidth);
+            console.log("Window-end: " + (windowWidth - borderWidth));
+
         }
-        else if (pos + 4 * getChildWidth() > getWindowWidth() - getBorderWidth() && moveRight) {
+        else if (pos + 4 * blockWidth > (windowWidth - borderWidth) && moveRight) {
             //swap direction to left
-            platforms[platforms.length - 1].style.left = (pos - getChildWidth()) + "px";
+            platforms[platforms.length - 1].style.left = (pos - blockWidth) + "px";
             moveRight = false;
             console.log("Swap to left");
         }
-        else if (pos - getChildWidth() >= getBorderWidth() - 10 && !moveRight) {
+        else if (pos - blockWidth >= borderWidth && !moveRight) {
             //continue moving left
-            platforms[platforms.length - 1].style.left = (pos - getChildWidth()) + "px";
+            platforms[platforms.length - 1].style.left = (pos - blockWidth) + "px";
             console.log("Continue moving left");
         }
-        else if (pos - getChildWidth() < getBorderWidth() && !moveRight) {
+        else if (pos - blockWidth < borderWidth && !moveRight) {
             //swap direction to right
-            platforms[platforms.length - 1].style.left = (pos + getChildWidth()) + "px";
+            platforms[platforms.length - 1].style.left = (pos + blockWidth) + "px";
             moveRight = true;
             console.log("Swap to right");
         }
-       
-        
 
-    }, 200);
+}
+
+function pause() {
+ 
+    clearInterval(moveInterval);  
+    paused = true;
+}
+
+function unpause() {
+    moveInterval = window.setInterval(movePlatform, 200);
+    paused = false;
 }
 
 function px2num (str) {
-    
-    if(str.length == 5) {
-        str = str.substring(0, 3);
-    }
-    else {
-        str = str.substring(0,2);
+
+    let ans = "";
+    for(c in str) {
+        if(str[c] == 'p') {
+            //end of number, break out
+            break;
+        }
+
+        ans+=str[c];
     }
 
-    let num = Number(str);
+    let num = Number(ans);
 
     return num;
 }
