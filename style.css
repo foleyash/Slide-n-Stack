@@ -33,8 +33,6 @@
     height: 100px;
     position:absolute;
     top: -100px;
-    left: 50%;
-    margin-left: -200px;
 }
 
 #first-platform {
@@ -57,7 +55,6 @@
         width:240px;
         height: 60px;
         top:-60px;
-        margin-left: -120px;
     }
 
     .child {
@@ -70,7 +67,6 @@
         width:120px;
         height: 30px;
         top:-30px;
-        margin-left: -60px;
     }
 
     .child {

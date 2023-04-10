@@ -1,10 +1,12 @@
 let floor = document.getElementById("game-floor");
 let pauseButton = document.getElementById("pause");
+let base = document.getElementById("base");
+base.style.left = (getWindowWidth() / 2 - 2 * getChildWidth()) + "px"
 let wave_up = true;
 let wave_size = 0;
 var blocksLeft = 3;
 var height = 2;
-var platforms = [];
+var platforms = [base];
 var moveRight = true;
 var paused = false;
 
@@ -41,13 +43,29 @@ let childWidth = getChildWidth();
 
 setBorders();
 setPlatform();
-var moveInterval = window.setInterval(movePlatform, 200);
+var moveInterval = window.setInterval(() => {
+    movePlatform();
+}, 200);
 
 window.onresize = () => {
+    let childWidth = getChildWidth();
     setBorders();
-    resizePlatforms();
+    resizePlatforms(childWidth);
     pause();
 }
+
+document.addEventListener("keypress", function(e) {
+    e.preventDefault();
+    console.log(e.keycode);
+    if(e.keycode == 32 ||
+        e.code == "Space" ||
+        e.key == " "
+        ) {
+        dropPlatform();
+    }
+    
+   // setPlatform();
+});
 
 pauseButton.addEventListener("click", () => {
     
@@ -148,11 +166,15 @@ function setPlatform() {
 
 }
 
-function resizePlatforms() {
+function resizePlatforms(childWidth) {
     for(let i = 0; i < platforms.length; i++) {
-        platforms[i].style.height = getChildWidth() + "px";
-        platforms[i].style.width = (getChildWidth()*blocksLeft) + "px";
-        platforms[i].style.top = (-1 * (i + 2) * getChildWidth()) + "px";
+        if(i == 0) {
+            platforms[i].style.left = (getWindowWidth() / 2 - 2 * childWidth) + "px";
+            continue;
+        }
+        platforms[i].style.height = childWidth + "px";
+        platforms[i].style.width = (childWidth*blocksLeft) + "px";
+        platforms[i].style.top = (-1 * (i + 1) * childWidth) + "px";
         let borderWidth = getBorderWidth();
         platforms[i].style.left = borderWidth + "px";
     }
@@ -164,33 +186,38 @@ function movePlatform() {
         let blockWidth = getChildWidth();
         let windowWidth = getWindowWidth();
         let borderWidth = getBorderWidth();
-        console.log(pos);
-        if(pos + 4 * blockWidth <= (windowWidth - borderWidth) && moveRight) {
+        if(pos + (1 + blocksLeft) * blockWidth <= (windowWidth - borderWidth) && moveRight) {
             //continue moving right
             platforms[platforms.length - 1].style.left = (pos + blockWidth) + "px";
-            console.log("Continue moving right");
-            console.log("Border-width: " + borderWidth);
-            console.log("Window-end: " + (windowWidth - borderWidth));
-
         }
-        else if (pos + 4 * blockWidth > (windowWidth - borderWidth) && moveRight) {
+        else if (pos + (1 + blocksLeft) * blockWidth > (windowWidth - borderWidth) && moveRight) {
             //swap direction to left
             platforms[platforms.length - 1].style.left = (pos - blockWidth) + "px";
             moveRight = false;
-            console.log("Swap to left");
         }
         else if (pos - blockWidth >= borderWidth && !moveRight) {
             //continue moving left
-            platforms[platforms.length - 1].style.left = (pos - blockWidth) + "px";
-            console.log("Continue moving left");
+            platforms[platforms.length - 1].style.left = (pos - blockWidth) + "px";      
         }
         else if (pos - blockWidth < borderWidth && !moveRight) {
             //swap direction to right
             platforms[platforms.length - 1].style.left = (pos + blockWidth) + "px";
             moveRight = true;
-            console.log("Swap to right");
         }
 
+}
+
+function dropPlatform() {
+
+    let pos = px2num(platforms[platforms.length - 1].style.left); 
+    let topPos = px2num(platforms[platforms.length - 2].style.left);
+    console.log("Base: " + topPos);
+    console.log("New: " + pos);
+    if(pos === topPos) {
+        console.log("perfect drop!");
+        setPlatform();
+    }
+    
 }
 
 function pause() {
