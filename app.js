@@ -1,7 +1,7 @@
 let floor = document.getElementById("game-floor");
 let pauseButton = document.getElementById("pause");
 let base = document.getElementById("base");
-base.style.left = (getWindowWidth() / 2 - 2 * getChildWidth()) + "px"
+base.style.left = (getWindowWidth() / 2 - 2 * getChildWidth()) + "px";
 let wave_up = true;
 let wave_size = 0;
 var blocksLeft = 3;
@@ -9,8 +9,9 @@ var height = 2;
 var platforms = [base];
 var moveRight = true;
 var paused = false;
+var firstBlock = true;
 
-let interval = window.setInterval(function() {
+let lavaInterval = window.setInterval(function() {
     if(wave_up) {
         wave_size++;
         let percent = 40 + wave_size;
@@ -56,12 +57,16 @@ window.onresize = () => {
 
 document.addEventListener("keypress", function(e) {
     e.preventDefault();
-    console.log(e.keycode);
     if(e.keycode == 32 ||
         e.code == "Space" ||
         e.key == " "
         ) {
-        dropPlatform();
+        
+        dropPlatform(firstBlock);
+        if(firstBlock) {
+            firstBlock = false;
+        }
+        
     }
     
    // setPlatform();
@@ -207,17 +212,51 @@ function movePlatform() {
 
 }
 
-function dropPlatform() {
+function dropPlatform(firstBlock) {
 
     let pos = px2num(platforms[platforms.length - 1].style.left); 
+    let top = px2num(platforms[platforms.length - 1].style.top);
     let topPos = px2num(platforms[platforms.length - 2].style.left);
+    var topWidth;
+    
+    firstBlock ? topWidth = 4 * getChildWidth() : topWidth = px2num(platforms[platforms.length - 2].style.width);
+
     console.log("Base: " + topPos);
     console.log("New: " + pos);
+    console.log("Width: " + topWidth);
+    
     if(pos === topPos) {
         console.log("perfect drop!");
         setPlatform();
     }
+    else if (pos >= topPos + blocksLeft * getChildWidth() ||
+            pos + blocksLeft * getChildWidth() <= topPos) {
+
+        let childWidth = getChildWidth();
+        
+        //all blocks are above or all blocks are below
+        for(let i = 0; i < blocksLeft; i++) {
+            let container = document.createElement('div');
+            container.style.position = "absolute";
+            container.style.height = childWidth + "px";
+            container.style.width = blocksLeft * childWidth + "px";
+            container.style.left = pos + i * childWidth + "px";
+            container.style.top = top + "px";
+            let cell = document.createElement('div');
+            cell.classList.add("child");
+            container.appendChild(cell);
+            floor.appendChild(container);
+        }
+
+
+    }
+   
     
+    
+}
+
+function fallInterval(container) {
+    var interval
 }
 
 function pause() {
