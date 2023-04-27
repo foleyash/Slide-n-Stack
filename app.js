@@ -7,9 +7,11 @@ let wave_size = 0;
 var blocksLeft = 3;
 var height = 2;
 var platforms = [base];
+
 var moveRight = true;
 var paused = false;
 var firstBlock = true;
+var gameOver = false;
 
 let lavaInterval = window.setInterval(function() {
     if(wave_up) {
@@ -52,9 +54,9 @@ var moveInterval = window.setInterval(() => {
 }, 200);
 
 window.onresize = () => {
-    let blockWidth = getChildWidth();
-    let windowWidth = getWindowWidth();
-    let borderWidth = getBorderWidth();
+    blockWidth = getChildWidth();
+    windowWidth = getWindowWidth();
+    borderWidth = getBorderWidth();
     setBorders();
     resizePlatforms(blockWidth);
     pause();
@@ -78,7 +80,8 @@ document.addEventListener("keypress", function(e) {
 
 pauseButton.addEventListener("click", () => {
     
-    !paused ? pause() : unpause();
+    console.log("pause/unpause");
+    !paused ? pause() : unpause(blockWidth, windowWidth, borderWidth);
     
 }); 
 
@@ -191,6 +194,7 @@ function resizePlatforms(childWidth) {
 
 function movePlatform(blockWidth, windowWidth, borderWidth) {
 
+      
         let pos = px2num(platforms[platforms.length - 1].style.left);
         if(pos + (1 + blocksLeft) * blockWidth <= (windowWidth - borderWidth) && moveRight) {
             //continue moving right
@@ -210,7 +214,7 @@ function movePlatform(blockWidth, windowWidth, borderWidth) {
             platforms[platforms.length - 1].style.left = (pos + blockWidth) + "px";
             moveRight = true;
         }
-
+  
 }
 
 function dropPlatform(firstBlock, blockWidth) {
@@ -219,12 +223,9 @@ function dropPlatform(firstBlock, blockWidth) {
     let top = px2num(platforms[platforms.length - 1].style.top);
     let topPos = px2num(platforms[platforms.length - 2].style.left);
     let topWidth;
+    let fallingBlocks = [];
     
-    firstBlock ? topWidth = 4 * blockWidth : topWidth = px2num(platforms[platforms.length - 2].style.width);
-
-    //console.log("Base: " + topPos);
-    //console.log("New: " + pos);
-    //console.log("Width: " + topWidth);
+    firstBlock ? topWidth = 4 * blockWidth : topWidth = px2num(platforms[platforms.length - 2].style.width)
     
     if(pos === topPos) {
         console.log("perfect drop!");
@@ -233,7 +234,7 @@ function dropPlatform(firstBlock, blockWidth) {
     else if (pos >= topPos + blocksLeft * blockWidth ||
             pos + blocksLeft * blockWidth <= topPos) {
 
-        let fallingBlocks = [];
+        
         for(let i = 0; i < blocksLeft; i++) {
             let container = document.createElement('div');
             container.style.position = "absolute";
@@ -249,6 +250,7 @@ function dropPlatform(firstBlock, blockWidth) {
         }
         platforms[platforms.length - 1].remove();
         fallInterval(fallingBlocks, blockWidth);
+       
 
     }
     else if(pos < topPos) {
@@ -264,8 +266,21 @@ function dropPlatform(firstBlock, blockWidth) {
         let width = blocksLeft * blockWidth - Math.abs(diff);
         div.style.width = width + "px";
         div.style.height = blockWidth + "px";
-        
-        
+
+        //add the extra blocks to falling blocks
+        let currWidth = blocksLeft * blockWidth;
+        let numFalling = (currWidth - width) / blockWidth;
+        for(let i = 0; i < numFalling; i++) {
+            let left = pos + i * blockWidth;
+            let block = document.createElement('div');
+            block.style.position = 'absolute';
+            block.style.left = left + "px";
+            block.style.top = top + "px";
+            block.classList.add("child");
+            block.style.height = blockWidth + "px";
+            floor.appendChild(block);
+            fallingBlocks.push(block);
+        }
 
         //fill the div with correct number of child nodes and update blocksLeft
         blocksLeft = width / blockWidth;
@@ -278,6 +293,7 @@ function dropPlatform(firstBlock, blockWidth) {
         platforms[platforms.length - 1].remove();
         platforms[platforms.length - 1] = div;
         floor.appendChild(div);
+        fallInterval(fallingBlocks, blockWidth);
         setPlatform(blockWidth);
     }
     else if (pos > topPos) {
@@ -285,7 +301,7 @@ function dropPlatform(firstBlock, blockWidth) {
 
         let div = document.createElement('div');
         let diff;
-        firstBlock ? diff = pos - blockWidth - topPos: diff = pos - topPos;
+        firstBlock ? diff = pos - blockWidth - topPos : diff = pos - topPos;
         div.style.position = 'absolute';
         div.style.left = pos + "px";
         div.style.top = top + "px";
@@ -294,6 +310,22 @@ function dropPlatform(firstBlock, blockWidth) {
         div.style.width = width + "px";
         div.style.height = blockWidth + "px";
 
+        //add the extra blocks to falling blocks
+        let currWidth = blocksLeft * blockWidth;
+        let numFalling = (currWidth - width) / blockWidth;
+
+        for(let i = 0; i < numFalling; i++) {
+            let left = pos + (blocksLeft - i - 1) * blockWidth;
+            let block = document.createElement('div');
+            block.style.position = 'absolute';
+            block.style.left = left + "px";
+            block.style.top = top + "px";
+            block.classList.add("child");
+            block.style.height = blockWidth + "px";
+            floor.appendChild(block);
+            fallingBlocks.push(block);
+        }
+
         //fill the div with correct number of child nodes and update blocksLeft
         blocksLeft = width / blockWidth;
         for(let i = 0; i < blocksLeft; i++) {
@@ -302,13 +334,15 @@ function dropPlatform(firstBlock, blockWidth) {
             div.appendChild(cell);
         }
 
+        //remove current platform and replace with resized platform
         platforms[platforms.length - 1].remove();
         platforms[platforms.length - 1] = div;
         floor.appendChild(div);
         setPlatform(blockWidth);
+        fallInterval(fallingBlocks, blockWidth);
     }
    
-    
+    console.log("Placed platform" + (platforms.length - 2));
     
 }
 
@@ -322,22 +356,29 @@ function fallInterval(fallingBlocks, blockWidth) {
         for(let i = 0; i < fallingBlocks.length; i++) {
            let currHeight = px2num(fallingBlocks[i].style.top);
             let topHeight;
-           /* if(platforms[platforms.length - 1 - count] != 'NaN' && platforms[platforms.length - 1 - count] != null 
-            && platforms[platforms.length - 1 - count] != '') {
-                topHeight = px2num(platforms[platforms.length - 1 - count].style.top);
-            } 
-            else {
-                topHeight = -1 * blockWidth;
-            } */
+           
+            if(count + 3 == platforms.length) {
+                console.log(px2num(platforms[platforms.length - 3 - count].style.width));
+            }
+            if (count + 3 <= platforms.length && px2num(platforms[platforms.length - 3 - count].style.left) <= px2num(fallingBlocks[i].style.left)
+            && px2num(platforms[platforms.length - 3 - count].style.left) + px2num(platforms[platforms.length - 3 - count].style.width) - blockWidth
+             >= px2num(fallingBlocks[i].style.left)) {
+                console.log("Platform " + (platforms.length - 3 - count));
+                console.log("Left Bound: " + px2num(platforms[platforms.length - 3 - count].style.left));
+                console.log("Right Bound: " + (px2num(platforms[platforms.length - 3 - count].style.left) + px2num(platforms[platforms.length - 3 - count ].style.width) - blockWidth));
+                console.log(px2num(fallingBlocks[i].style.left));
+                fallingBlocks[i].remove();
+                continue;
+            }
 
-            if(currHeight >= topHeight - blockWidth &&
+           /* if(currHeight >= topHeight - blockWidth &&
                 fallingBlocks[i].style.left == platforms[platforms.length - 1 - count].style.left) {
                     if(fallingBlocks[i]) {
                         fallingBlocks[i].remove();
                     }
                     continue;
-                } 
-            else if (currHeight >= -1 * blockWidth) {
+                } */
+            if (currHeight >= -1 * blockWidth) {
                 //creates fireball splashes once the blocks hit the lava
                 let fireball = document.createElement('div');
                 fireball.style.width = blockWidth / 3 + "px";
@@ -348,8 +389,6 @@ function fallInterval(fallingBlocks, blockWidth) {
                 fireball.style.background = "red";
                 floor.appendChild(fireball);
                 fireballPhysics(fireball);
-                console.log(fireball.style.top);
-                console.log(fireball.style.left);
 
                 fallingBlocks[i].remove();
                 continue;
@@ -402,11 +441,12 @@ function pause() {
     paused = true;
 }
 
-function unpause() {
+function unpause(blockWidth, windowWidth, borderWidth) {
+    paused = false;
     moveInterval = window.setInterval(() => {
         movePlatform(blockWidth, windowWidth, borderWidth);
+        console.log("check");
     }, 200);
-    paused = false;
 }
 
 function px2num (str) {

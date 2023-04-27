@@ -29,10 +29,10 @@
 }
 
 #base {
-    width:400px;
-    height: 100px;
+    width:320px;
+    height: 80px;
     position:absolute;
-    top: -100px;
+    top: -80px;
 }
 
 #first-platform {
@@ -43,7 +43,7 @@
 }
 
 .child {
-    width: 100px;
+    width: 80px;
     height:100%;
     display:inline-block;
     border: solid black 1px;
