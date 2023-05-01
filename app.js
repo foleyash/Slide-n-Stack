@@ -222,7 +222,7 @@ function dropPlatform(firstBlock, blockWidth) {
     let pos = px2num(platforms[platforms.length - 1].style.left); 
     let top = px2num(platforms[platforms.length - 1].style.top);
     let topPos = px2num(platforms[platforms.length - 2].style.left);
-    let topWidth;
+    let topWidth = blocksLeft * blockWidth;
     let fallingBlocks = [];
     
     firstBlock ? topWidth = 4 * blockWidth : topWidth = px2num(platforms[platforms.length - 2].style.width)
@@ -231,8 +231,8 @@ function dropPlatform(firstBlock, blockWidth) {
         console.log("perfect drop!");
         setPlatform(blockWidth);
     }
-    else if (pos >= topPos + blocksLeft * blockWidth ||
-            pos + blocksLeft * blockWidth <= topPos) {
+    else if (pos >= topPos + topWidth ||
+            pos + topWidth <= topPos) {
 
         
         for(let i = 0; i < blocksLeft; i++) {
@@ -354,47 +354,51 @@ function fallInterval(fallingBlocks, blockWidth) {
         let allDown = true;
         
         for(let i = 0; i < fallingBlocks.length; i++) {
+            //get the position of the current block
            let currHeight = px2num(fallingBlocks[i].style.top);
-            let topHeight;
-           
-            if(count + 3 == platforms.length) {
-                console.log(px2num(platforms[platforms.length - 3 - count].style.width));
-            }
-            if (count + 3 <= platforms.length && px2num(platforms[platforms.length - 3 - count].style.left) <= px2num(fallingBlocks[i].style.left)
-            && px2num(platforms[platforms.length - 3 - count].style.left) + px2num(platforms[platforms.length - 3 - count].style.width) - blockWidth
-             >= px2num(fallingBlocks[i].style.left)) {
-                console.log("Platform " + (platforms.length - 3 - count));
-                console.log("Left Bound: " + px2num(platforms[platforms.length - 3 - count].style.left));
-                console.log("Right Bound: " + (px2num(platforms[platforms.length - 3 - count].style.left) + px2num(platforms[platforms.length - 3 - count ].style.width) - blockWidth));
-                console.log(px2num(fallingBlocks[i].style.left));
-                fallingBlocks[i].remove();
-                continue;
-            }
+           let currLeft = px2num(fallingBlocks[i].style.left);
+          
+           //get the position and width of the block right below the current block
+          let nextLeft;
+          let nextWidth;
+            
+          if(platforms.length - count - 2 >= 0) {
+            nextLeft = px2num(platforms[platforms.length - count - 2].style.left);
+            nextWidth = px2num(platforms[platforms.length - count - 2].style.width);
+          }
 
-           /* if(currHeight >= topHeight - blockWidth &&
-                fallingBlocks[i].style.left == platforms[platforms.length - 1 - count].style.left) {
-                    if(fallingBlocks[i]) {
-                        fallingBlocks[i].remove();
-                    }
+            if(platforms.length - count - 2 == 0 && 
+                currLeft >= nextLeft && currLeft <= nextLeft + 3 * blockWidth) {
+                
+                    console.log("removed at platform " + (platforms.length - count - 2));
+                    fallingBlocks[i].remove();
                     continue;
-                } */
-            if (currHeight >= -1 * blockWidth) {
-                //creates fireball splashes once the blocks hit the lava
-                let fireball = document.createElement('div');
-                fireball.style.width = blockWidth / 3 + "px";
-                fireball.style.height = blockWidth / 3 + "px";
-                fireball.style.position = "absolute";
-                fireball.style.top = "0px";
-                fireball.style.left = fallingBlocks[i].style.left;
-                fireball.style.background = "red";
-                floor.appendChild(fireball);
-                fireballPhysics(fireball);
+            }
 
+            //check if falling block has landed on existing platform
+            if(currLeft >= nextLeft && currLeft <= nextLeft + nextWidth - blockWidth) {
+                console.log("removed at platform " + (platforms.length - count - 2));
                 fallingBlocks[i].remove();
                 continue;
             }
 
+           //check if the current height has reached the lava
+           if (currHeight >= -1 * blockWidth) {
+            //creates fireball splashes once the blocks hit the lava
+            let fireball = document.createElement('div');
+            fireball.style.width = blockWidth / 3 + "px";
+            fireball.style.height = blockWidth / 3 + "px";
+            fireball.style.position = "absolute";
+            fireball.style.top = "0px";
+            fireball.style.left = fallingBlocks[i].style.left;
+            fireball.style.background = "red";
+            floor.appendChild(fireball);
+            fireballPhysics(fireball);
 
+            fallingBlocks[i].remove();
+            continue;
+            } 
+            
             fallingBlocks[i].style.top = currHeight + blockWidth + "px";
             allDown = false;
         }
