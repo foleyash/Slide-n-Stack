@@ -5,7 +5,7 @@
 }
 
 #background {
-    background-color: black;
+    background-color: rgb(132, 26, 3);
     position:relative;
     width:100%;
     height:120vh;
@@ -16,7 +16,8 @@
     position:absolute;
     width: 100%;
     height:15vh;
-    top:0;
+    top:-15vh;
+    transition: .7s ease-in-out;
     left:0;
 }
 
@@ -29,10 +30,10 @@
 }
 
 #base {
-    width:320px;
-    height: 80px;
+    width:240px;
+    height: 60px;
     position:absolute;
-    top: -80px;
+    top: -60px;
 }
 
 #first-platform {
@@ -43,22 +44,79 @@
 }
 
 .child {
-    width: 80px;
+    width: 60px;
     height:100%;
     display:inline-block;
     border: solid black 1px;
     background-color: yellow;
 }
 
+.title-text {
+    color: rgb(255, 255, 0);
+    font-family: 'Bruno Ace SC', cursive;
+    font-size: 68px;
+    margin-right: 3px;
+    text-align: center;
+}
+
+#slide-n-stack {
+    position:absolute;
+    top:42vh;
+    left: 50%;
+    width: 80%;
+    margin-left: -40%;
+    text-align: center;
+}
+
+#icon-container {
+    position:absolute;
+    top:55vh;
+    left:34%;
+    width:33%;
+    height: 100px;
+}
+
+#play-container {
+    position: absolute;
+    left: 10%;
+    height:fit-content;
+    width: 30%;
+    margin-right:20%;
+    background: none;
+    text-align:center;
+}
+
+#play-button {
+
+    font-size:70px;
+    cursor: pointer;
+ 
+}
+
+#instructions {
+    
+    font-size:70px;
+    cursor:pointer;
+}
+
+#instructions-container {
+    position: absolute;
+    right: 10%;
+    height:fit-content;
+    width: 30%;
+    background: none;
+    text-align:center;
+}
+
 @media only screen and (max-width: 1660px) {
     #base {
-        width : 320px;
-        height: 80px;
-        top:-80px;
+        width : 240px;
+        height: 60px;
+        top:-60px;
     }
 
     .child {
-        width: 80px;
+        width: 60px;
     }
 }
 
@@ -72,6 +130,18 @@
     .child {
         width: 60px;
     }
+
+    .title-text {
+        font-size: 54px;
+    }
+
+    #play-button {
+        font-size: 60px;
+    }
+
+    #instructions {
+        font-size: 60px;
+    }
 }
 
 @media only screen and (max-width: 768px) {
@@ -84,6 +154,26 @@
     .child {
         width: 30px;
     }
+
+    .title-text {
+        font-size: 48px;
+    }
+
+    #play-button {
+        font-size: 50px;
+    }
+
+    #instructions {
+        font-size: 50px;
+    }
+
+    #icon-container {
+        top: 60vh;
+    }
+}
+
+@media only screen and (max-width: 510px) {
+
 }
 
 #left-border {
@@ -91,7 +181,7 @@
     left:0;
     top:0;
     height: 85vh;
-    background-color: rgb(199, 73, 73);
+    background-color: black;
 }
 
 #right-border {
@@ -99,7 +189,7 @@
     right:0;
     top:0;
     height: 85vh;
-    background-color: rgb(199, 73, 73);
+    background-color: black;
 }
 
 #test-blocks {
@@ -116,3 +206,6 @@
     border: black solid 3px;
     background-color: white;
 }
+
+
+

@@ -1,6 +1,10 @@
 let floor = document.getElementById("game-floor");
 let pauseButton = document.getElementById("pause");
 let base = document.getElementById("base");
+var playButton = document.getElementById("play-button");
+var titleText = document.getElementById("slide-n-stack");
+var navBar = document.getElementById("nav-bar");
+
 base.style.left = (getWindowWidth() / 2 - 2 * getChildWidth()) + "px";
 let wave_up = true;
 let wave_size = 0;
@@ -9,7 +13,7 @@ var height = 2;
 var platforms = [base];
 
 var moveRight = true;
-var paused = false;
+var paused = true;
 var firstBlock = true;
 var gameOver = false;
 var gameSpeed = 150;
@@ -35,6 +39,46 @@ let lavaInterval = window.setInterval(function() {
     }
 }, 50); 
 
+//to begin game click hovering play button
+const buttonStyle = getComputedStyle(playButton);
+let original_size = px2num(buttonStyle.fontSize);
+let hover = false;
+playButton.onmouseover = function() {
+    hover = true;
+}
+playButton.onmouseout = function() {
+    hover = false;
+}
+
+playButton.onclick = startGame;
+
+let hover_size = 0;
+let hoverUp = true;
+/*let hoverInterval = window.setInterval(() => {
+    
+    if(hover) {
+        playButton.style.color = white
+        return;
+    }
+
+    if(hoverUp) {
+        hover_size += .4;
+        playButton.style.fontSize = (original_size + hover_size) + "px";
+       // playButton.style.marginLeft = (px2num(playButton.style.marginLeft) - hover_size) + "px";
+        if(hover_size >= .1 * original_size) {
+            hoverUp = false;
+        }
+    }
+    else {
+        hover_size -= .4;
+        playButton.style.fontSize = (original_size + hover_size) + "px";
+       // playButton.style.marginLeft = (px2num(playButton.style.marginLeft) - hover_size) + "px";
+        if(hover_size <= -1 * (.1 * original_size)) {
+            hoverUp = true;
+        }
+    }
+}, 20); */
+
 //retrieve the width of child block, window, and border
 
 var blockWidth = getChildWidth();
@@ -59,8 +103,13 @@ window.onresize = () => {
     pause();
 }
 
+pauseButton.addEventListener("click", pause);
+
 document.addEventListener("keypress", function(e) {
     e.preventDefault();
+    if(paused) {
+        return;
+    }
     if(e.keycode == 32 ||
         e.code == "Space" ||
         e.key == " "
@@ -75,12 +124,11 @@ document.addEventListener("keypress", function(e) {
     
 });
 
-pauseButton.addEventListener("click", () => {
-    
-    console.log("pause/unpause");
-    !paused ? pause() : unpause(blockWidth, windowWidth, borderWidth);
-    
-}); 
+function pauseGame() {
+    pause();
+    pauseButton.addEventListener("click", )
+}
+ 
 
 //FUNCTION DEFINITIONS BELOW ****
 
@@ -470,21 +518,40 @@ function blockBreak(left, top, width) {
 
 }
 
+function startGame() {
+    playButton.style.transition = ".5s";
+    playButton.style.opacity = "0";
+
+    window.setTimeout(function() {
+        playButton.remove();
+    }, 500);
+
+    navBar.style.top = "0";
+
+    resizePlatforms(blockWidth);
+    paused = false;
+    
+}
+
 function gameOver() {
 
 }
 
 function pause() {
- 
-    clearInterval(moveInterval);  
+    
+    clearInterval(moveInterval); 
     paused = true;
+
 }
 
 function unpause(blockWidth, windowWidth, borderWidth) {
-    paused = false;
-    moveInterval = window.setInterval(() => {
-        movePlatform(blockWidth, windowWidth, borderWidth);
-    }, gameSpeed);
+    
+        moveInterval = window.setInterval(() => {
+            movePlatform(blockWidth, windowWidth, borderWidth);
+        }, gameSpeed);
+        paused = false;     
+
+   
 }
 
 function px2num (str) {
