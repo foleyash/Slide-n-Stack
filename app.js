@@ -1,5 +1,4 @@
 let floor = document.getElementById("game-floor");
-let pauseButton = document.getElementById("pause");
 let base = document.getElementById("base");
 var playButton = document.getElementById("play-button-start");
 var titleText = document.getElementById("slide-n-stack");
@@ -41,45 +40,11 @@ let lavaInterval = window.setInterval(function() {
     }
 }, 50); 
 
-//to begin game click hovering play button
-const buttonStyle = getComputedStyle(playButton);
-let original_size = px2num(buttonStyle.fontSize);
-let hover = false;
-playButton.onmouseover = function() {
-    hover = true;
-}
-playButton.onmouseout = function() {
-    hover = false;
-}
+//icon features for leaderboard, instructions, and play game at start
 
 playButton.onclick = startGame;
 
-let hover_size = 0;
-let hoverUp = true;
-/*let hoverInterval = window.setInterval(() => {
-    
-    if(hover) {
-        playButton.style.color = white
-        return;
-    }
-
-    if(hoverUp) {
-        hover_size += .4;
-        playButton.style.fontSize = (original_size + hover_size) + "px";
-       // playButton.style.marginLeft = (px2num(playButton.style.marginLeft) - hover_size) + "px";
-        if(hover_size >= .1 * original_size) {
-            hoverUp = false;
-        }
-    }
-    else {
-        hover_size -= .4;
-        playButton.style.fontSize = (original_size + hover_size) + "px";
-       // playButton.style.marginLeft = (px2num(playButton.style.marginLeft) - hover_size) + "px";
-        if(hover_size <= -1 * (.1 * original_size)) {
-            hoverUp = true;
-        }
-    }
-}, 20); */
+instructions.onclick = openInstructions;
 
 //retrieve the width of child block, window, and border
 
@@ -102,10 +67,10 @@ window.onresize = () => {
     borderWidth = getBorderWidth();
     setBorders();
     resizePlatforms(blockWidth);
-   // pause();
+   
 }
 
-pauseButton.addEventListener("click", pause);
+//EVENT LISTENERS BELOW ****
 
 document.addEventListener("keypress", function(e) {
     e.preventDefault();
@@ -125,12 +90,6 @@ document.addEventListener("keypress", function(e) {
     }
     
 });
-
-function pauseGame() {
-    pause();
-    pauseButton.addEventListener("click", )
-}
- 
 
 //FUNCTION DEFINITIONS BELOW ****
 
@@ -450,7 +409,7 @@ function fallInterval(fallingBlocks, blockWidth, last) {
             fireball.style.height = blockWidth / 3 + "px";
             fireball.style.position = "absolute";
             fireball.style.top = "0px";
-            fireball.style.left = fallingBlocks[i].style.left;
+            fireball.style.left = (px2num(fallingBlocks[i].style.left) + (blockWidth /2)) + "px";
             fireball.style.background = "red";
             floor.appendChild(fireball);
             fireballPhysics(fireball);
@@ -547,6 +506,22 @@ function startGame() {
     resizePlatforms(blockWidth);
     paused = false;
     
+}
+
+function openInstructions() {
+    let background = document.getElementById("instructions");
+    let X = document.getElementById("instructionX");
+
+    background.style.height = "50vh";
+    X.style.opacity = "100";
+    X.style.cursor = "pointer";
+
+    titleText.style.opacity = "0";
+    playButton.style.opacity = "0";
+    leaderboard.style.opacity = "0";
+    instructions.style.opacity = "0";
+
+
 }
 
 function gameOver() {
