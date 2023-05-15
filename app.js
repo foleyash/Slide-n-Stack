@@ -1,9 +1,11 @@
 let floor = document.getElementById("game-floor");
 let pauseButton = document.getElementById("pause");
 let base = document.getElementById("base");
-var playButton = document.getElementById("play-button");
+var playButton = document.getElementById("play-button-start");
 var titleText = document.getElementById("slide-n-stack");
 var navBar = document.getElementById("nav-bar");
+var instructions = document.getElementById("instructions-start");
+var leaderboard = document.getElementById("leaderboard-start");
 
 base.style.left = (getWindowWidth() / 2 - 2 * getChildWidth()) + "px";
 let wave_up = true;
@@ -100,7 +102,7 @@ window.onresize = () => {
     borderWidth = getBorderWidth();
     setBorders();
     resizePlatforms(blockWidth);
-    pause();
+   // pause();
 }
 
 pauseButton.addEventListener("click", pause);
@@ -521,12 +523,26 @@ function blockBreak(left, top, width) {
 function startGame() {
     playButton.style.transition = ".5s";
     playButton.style.opacity = "0";
+    instructions.style.transition = ".5s";
+    instructions.style.opacity = "0";
+    leaderboard.style.transition = ".5s";
+    leaderboard.style.opacity = "0";
 
     window.setTimeout(function() {
         playButton.remove();
+        instructions.remove();
+        leaderboard.remove();
     }, 500);
 
+    navBar.style.transition = ".7s ease-in-out"
     navBar.style.top = "0";
+    titleText.style.transition = "1s ease-in-out";
+    titleText.style.top = "3vh";
+    
+    setTimeout(function() {
+        titleText.style.transition = "0s";
+        navBar.style.transition = "0s";
+    }, 1000);
 
     resizePlatforms(blockWidth);
     paused = false;

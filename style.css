@@ -17,8 +17,8 @@
     width: 100%;
     height:15vh;
     top:-15vh;
-    transition: .7s ease-in-out;
     left:0;
+    border: 3px solid white;
 }
 
 #game-floor {
@@ -74,38 +74,57 @@
     left:34%;
     width:33%;
     height: 100px;
+    display:flex;
 }
 
 #play-container {
-    position: absolute;
-    left: 10%;
-    height:fit-content;
-    width: 30%;
-    margin-right:20%;
+    
     background: none;
-    text-align:center;
+    text-align:center; 
+    width:24%;
+    margin-left:7%;
+    margin-right:7%;
 }
 
-#play-button {
+#play-button-start {
 
     font-size:70px;
     cursor: pointer;
  
 }
 
-#instructions {
+#instructions-start {
     
     font-size:70px;
     cursor:pointer;
 }
 
 #instructions-container {
-    position: absolute;
+    /*position: absolute;
     right: 10%;
     height:fit-content;
-    width: 30%;
+    width: 20%; */
     background: none;
     text-align:center;
+    width:24%;
+    margin-left:7%;
+
+}
+
+#leaderboard-container {
+    /*position: absolute;
+    left: 8%;
+    margin-right: 12%; */
+    height:fit-content;
+    width: 24%;
+    background: none;
+    text-align:center;
+    margin-right:7%;
+}
+
+#leaderboard-start {
+    font-size: 70px;
+    cursor: pointer;
 }
 
 @media only screen and (max-width: 1660px) {
@@ -135,11 +154,15 @@
         font-size: 54px;
     }
 
-    #play-button {
+    #play-button-start {
         font-size: 60px;
     }
 
-    #instructions {
+    #instructions-start {
+        font-size: 60px;
+    }
+
+    #leaderboard-start {
         font-size: 60px;
     }
 }
@@ -156,14 +179,18 @@
     }
 
     .title-text {
-        font-size: 48px;
+        font-size: 42px;
     }
 
-    #play-button {
+    #play-button-start {
         font-size: 50px;
     }
 
-    #instructions {
+    #instructions-start {
+        font-size: 50px;
+    }
+
+    #leaderboard-start {
         font-size: 50px;
     }
 
@@ -173,7 +200,35 @@
 }
 
 @media only screen and (max-width: 510px) {
+    #base {
+        width:120px;
+        height: 30px;
+        top:-30px;
+    }
 
+    .child {
+        width: 30px;
+    }
+
+    .title-text {
+        font-size: 36px;
+    }
+
+    #play-button-start {
+        font-size: 40px;
+    }
+
+    #instructions-start {
+        font-size: 40px;
+    }
+
+    #leaderboard-start {
+        font-size: 40px;
+    }
+
+    #icon-container {
+        top: 60vh;
+    }
 }
 
 #left-border {
