@@ -509,7 +509,9 @@ function startGame() {
 }
 
 function openInstructions() {
+    pause();
     let background = document.getElementById("instructions");
+    let textBox = document.getElementById("textBox");
     let X = document.getElementById("instructionX");
 
     background.style.height = "50vh";
@@ -521,7 +523,45 @@ function openInstructions() {
     leaderboard.style.opacity = "0";
     instructions.style.opacity = "0";
 
+    setTimeout(function() {
+        textBox.getElementsByTagName('h1')[0].style.opacity = "100";
+        textBox.getElementsByTagName('p')[0].style.opacity = "100";
+    }, 140);
 
+    setTimeout(function() {
+        textBox.getElementsByTagName('p')[1].style.opacity = "100";
+    }, 220)
+
+    X.addEventListener("click", closeInstructions);
+
+}
+
+function closeInstructions() {
+    unpause(blockWidth, windowWidth, borderWidth);
+    paused = true;
+
+    let background = document.getElementById("instructions");
+    let textBox = document.getElementById("textBox");
+    let X = document.getElementById("instructionX");
+
+    background.style.height = "0";
+    X.style.opacity = "0";
+    X.style.cursor = "auto";
+
+    setTimeout(function() {
+        textBox.getElementsByTagName('h1')[0].style.opacity = "0";
+        textBox.getElementsByTagName('p')[0].style.opacity = "0";
+        textBox.getElementsByTagName('p')[1].style.opacity = "0";
+    }, 140);
+
+    setTimeout(function() {
+        titleText.style.opacity = "100";
+        playButton.style.opacity = "100";
+        leaderboard.style.opacity = "100";
+        instructions.style.opacity = "100";
+    }, 200);
+
+    X.removeEventListener("click", closeInstructions);
 }
 
 function gameOver() {
@@ -542,7 +582,6 @@ function unpause(blockWidth, windowWidth, borderWidth) {
         }, gameSpeed);
         paused = false;     
 
-   
 }
 
 function px2num (str) {
