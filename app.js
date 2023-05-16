@@ -10,7 +10,8 @@ base.style.left = (getWindowWidth() / 2 - 2 * getChildWidth()) + "px";
 let wave_up = true;
 let wave_size = 0;
 var blocksLeft = 3;
-var height = 2;
+var height = 1;
+var level = 1;
 var platforms = [base];
 
 var moveRight = true;
@@ -67,7 +68,6 @@ window.onresize = () => {
     borderWidth = getBorderWidth();
     setBorders();
     resizePlatforms(blockWidth);
-   
 }
 
 //EVENT LISTENERS BELOW ****
@@ -163,6 +163,9 @@ function getBorderWidth() {
 
 
 function setPlatform(blockWidth) {
+
+    ++height;
+
     let container = document.createElement('div');
     container.style.position = "absolute";
     container.style.width = (blockWidth*blocksLeft) + "px";
@@ -176,8 +179,6 @@ function setPlatform(blockWidth) {
         cell.classList.add('child');
         container.appendChild(cell);
     }
-
-    height++;
 
     floor.appendChild(container);
     platforms.push(container);
@@ -235,8 +236,13 @@ function dropPlatform(firstBlock, blockWidth) {
     firstBlock ? topWidth = 4 * blockWidth : topWidth = px2num(platforms[platforms.length - 2].style.width)
     
     if(pos === topPos) {
-        console.log("perfect drop!");
-        setPlatform(blockWidth);
+        if(height === 8) {
+            levelUp();
+        }
+        else {
+            setPlatform(blockWidth);
+        }
+        
     }
     else if (pos >= topPos + topWidth ||
             pos + topWidth <= topPos) { //blocks placed completely off of the top platform
@@ -425,8 +431,14 @@ function fallInterval(fallingBlocks, blockWidth, last) {
 
         if(allDown) {
             if(!last){
-                setPlatform(blockWidth);
-                unpause(blockWidth, windowWidth, borderWidth);
+                if(height === 8) {
+                    levelUp();
+                }
+                else {
+                    setPlatform(blockWidth);
+                    unpause(blockWidth, windowWidth, borderWidth);
+                }
+            
             } 
             clearInterval(interval);
         }
@@ -460,9 +472,7 @@ function fireballPhysics(fireball) {
 }
 
 function blockBreak(left, top, width) {
-    console.log(left);
-    console.log(top);
-    console.log(width);
+
     let block = document.createElement('div');
     block.style.position = 'absolute';
     block.style.background = 'white';
@@ -477,6 +487,34 @@ function blockBreak(left, top, width) {
         block.remove();
     }, 100)
 
+}
+
+function levelUp() {
+    pause();
+    gameSpeed -= (50 - 10*level);
+    let counter = 0;
+    let interval = window.setInterval(() => {
+
+        if(counter === 6) {
+            clearInterval(interval);
+        }
+
+        for(let i = 0; i < platforms.length; i++) {
+            platforms[i].style.top = (px2num(platforms[i].style.top) + blockWidth) + "px";
+        }
+
+        platforms[0].remove();
+        platforms.shift();
+        counter++;
+        height--;
+    }, 400);
+
+    setTimeout(() => {
+        setPlatform(blockWidth);
+        unpause(blockWidth, windowWidth, borderWidth);
+    }, 2800);
+    
+    level++;
 }
 
 function startGame() {
