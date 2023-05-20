@@ -205,6 +205,13 @@ i#instructionX:hover {
     font-family: 'Bruno Ace SC';
 }
 
+.shake {
+    width: 5px;
+    display: inline-block;
+    transition: 1s;
+    transform:rotate(360deg);
+}
+
 @media only screen and (max-width: 1660px) {
     #base {
         width : 240px;
@@ -254,6 +261,7 @@ i#instructionX:hover {
 
     #textBox h1 {
         font-size: 20px;
+        margin-top: 15%;
     }
 
     #textBox p {
@@ -426,6 +434,7 @@ i#instructionX:hover {
     top:0;
     height: 85vh;
     background-color: black;
+    border: white 3px solid;
 }
 
 #right-border {
@@ -434,6 +443,7 @@ i#instructionX:hover {
     top:0;
     height: 85vh;
     background-color: black;
+    border: white 3px solid;
 }
 
 #test-blocks {

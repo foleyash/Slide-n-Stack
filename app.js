@@ -6,7 +6,7 @@ var navBar = document.getElementById("nav-bar");
 var instructions = document.getElementById("instructions-start");
 var leaderboard = document.getElementById("leaderboard-start");
 var currScore = document.getElementById("curr-score");
-var highScore = document.getElementById("high-score");
+var highScore = document.getElementsByClassName("high-score")[0];
 
 base.style.left = (getWindowWidth() / 2 - 2 * getChildWidth()) + "px";
 let wave_up = true;
@@ -14,13 +14,15 @@ let wave_size = 0;
 var blocksLeft = 3;
 var height = 1;
 var level = 1;
+var gameSpeed = 150;
 var platforms = [base];
 
 var moveRight = true;
 var paused = true;
 var firstBlock = true;
 var gameOver = false;
-var gameSpeed = 150;
+var newHighScore = false;
+
 
 let lavaInterval = window.setInterval(function() {
     if(wave_up) {
@@ -495,11 +497,28 @@ function blockBreak(left, top, width) {
 function levelUp() {
     level++;
     currScore.textContent = level;
+    currScore.style.color = "white";
+    currScore.style.fontStyle = "bold";
     if(Number(highScore.textContent) < Number(currScore.textContent)) {
         highScore.textContent = currScore.textContent;
+        highScore.style.fontStyle = "bold";
+        highScore.style.color = "white";
+        if(!newHighScore) {
+            console.log("check");
+            highScore.classList.add("shake");
+            newHighScore = true;
+        }
     }
+
+    setTimeout(function() {
+        highScore.style.color = "yellow";
+        highScore.style.fontStyle = "normal";
+        highScore.classList.remove("shake");
+        currScore.style.color = "yellow";
+        currScore.style.fontStyle = "normal";
+    }, 1010);
     pause();
-    gameSpeed -= (50 - 10*level);
+    gameSpeed -= (48 - 8*level);
     let counter = 0;
     let interval = window.setInterval(() => {
 
