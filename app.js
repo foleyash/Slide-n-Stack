@@ -5,6 +5,8 @@ var titleText = document.getElementById("slide-n-stack");
 var navBar = document.getElementById("nav-bar");
 var instructions = document.getElementById("instructions-start");
 var leaderboard = document.getElementById("leaderboard-start");
+var currScore = document.getElementById("curr-score");
+var highScore = document.getElementById("high-score");
 
 base.style.left = (getWindowWidth() / 2 - 2 * getChildWidth()) + "px";
 let wave_up = true;
@@ -388,7 +390,8 @@ function fallInterval(fallingBlocks, blockWidth, last) {
         
             //if at the bottom platform (special case)
             if(platforms.length - count - 2 == 0 && 
-                currLeft >= nextLeft && currLeft <= nextLeft + 3 * blockWidth) {
+                currLeft >= nextLeft && currLeft <= nextLeft + 3 * blockWidth &&
+                level == 1) {
                     let left = fallingBlocks[i].style.left;
                     let top = fallingBlocks[i].style.top;
                    fallingBlocks[i].remove();
@@ -490,6 +493,11 @@ function blockBreak(left, top, width) {
 }
 
 function levelUp() {
+    level++;
+    currScore.textContent = level;
+    if(Number(highScore.textContent) < Number(currScore.textContent)) {
+        highScore.textContent = currScore.textContent;
+    }
     pause();
     gameSpeed -= (50 - 10*level);
     let counter = 0;
@@ -511,19 +519,28 @@ function levelUp() {
 
     setTimeout(() => {
         setPlatform(blockWidth);
-        unpause(blockWidth, windowWidth, borderWidth);
+        unpause(blockWidth, windowWidth, borderWidth); 
     }, 2800);
     
-    level++;
 }
 
 function startGame() {
+    let scoreContainer = document.getElementById("score-container");
+    let scores = scoreContainer.children;
+    
     playButton.style.transition = ".5s";
     playButton.style.opacity = "0";
     instructions.style.transition = ".5s";
     instructions.style.opacity = "0";
     leaderboard.style.transition = ".5s";
     leaderboard.style.opacity = "0";
+    scoreContainer.style.transition = "1s ease-in-out";
+    scoreContainer.style.left = "5%";
+
+    for(let i = 0; i < 2; i++) {
+        scores[i].style.transition = "2s";
+        scores[i].style.opacity = "1";
+    }
 
     window.setTimeout(function() {
         playButton.remove();
@@ -539,6 +556,10 @@ function startGame() {
     setTimeout(function() {
         titleText.style.transition = "0s";
         navBar.style.transition = "0s";
+        scoreContainer.style.transition = "0s";
+        for(let i = 0; i < 2; i++) {
+            scores[i].style.transition = "0s";
+        }
     }, 1000);
 
     resizePlatforms(blockWidth);
