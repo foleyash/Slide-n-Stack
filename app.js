@@ -7,6 +7,7 @@ var instructions = document.getElementById("instructions-start");
 var leaderboard = document.getElementById("leaderboard-start");
 var currScore = document.getElementById("curr-score");
 var highScore = document.getElementsByClassName("high-score")[0];
+var restartButton = document.getElementById("restart-button");
 
 base.style.left = (getWindowWidth() / 2 - 2 * getChildWidth()) + "px";
 let wave_up = true;
@@ -16,12 +17,14 @@ var height = 1;
 var level = 1;
 var gameSpeed = 150;
 var platforms = [base];
+var colorPercent = 20;
 
 var moveRight = true;
 var paused = true;
 var firstBlock = true;
 var gameOver = false;
 var newHighScore = false;
+var loadScreen = true;
 
 
 let lavaInterval = window.setInterval(function() {
@@ -50,6 +53,8 @@ let lavaInterval = window.setInterval(function() {
 playButton.onclick = startGame;
 
 instructions.onclick = openInstructions;
+
+restartButton.onclick = restartGame;
 
 //retrieve the width of child block, window, and border
 
@@ -147,14 +152,27 @@ function blocksInWindow() {
 }
 
 function setBorders() {
-    let borderWidth = getBorderWidth(); 
+    let borderWidth = getBorderWidth();
 
     let leftBorder = document.getElementById("left-border");
     let rightBorder = document.getElementById("right-border");
 
+    if(borderWidth <= 6) {
+        leftBorder.style.border = "none";
+        rightBorder.style.border = "none"
+        leftBorder.style.background = "white";
+        rightBorder.style.background = "white";
+    } 
+    else {
+        leftBorder.style.border = "3px white solid";
+        rightBorder.style.border = "3px white solid";
+        leftBorder.style.background = "black";
+        rightBorder.style.background = "black";
+    } 
+
     leftBorder.style.width = borderWidth + "px";
     rightBorder.style.width = borderWidth + "px";
-}
+} 
 
 function getBorderWidth() {
     let blocks = blocksInWindow();
@@ -504,7 +522,6 @@ function levelUp() {
         highScore.style.fontStyle = "bold";
         highScore.style.color = "white";
         if(!newHighScore) {
-            console.log("check");
             highScore.classList.add("shake");
             newHighScore = true;
         }
@@ -518,8 +535,12 @@ function levelUp() {
         currScore.style.fontStyle = "normal";
     }, 1010);
     pause();
-    gameSpeed -= (48 - 8*level);
+
+    if(48 - 8*level < 16) gameSpeed -= 10;
+    else gameSpeed -= (48 - 8*level);
+
     let counter = 0;
+    let backgroundColor = document.getElementById('background');
     let interval = window.setInterval(() => {
 
         if(counter === 6) {
@@ -530,22 +551,83 @@ function levelUp() {
             platforms[i].style.top = (px2num(platforms[i].style.top) + blockWidth) + "px";
         }
 
+        colorPercent += 2;
+        backgroundColor.style.backgroundImage = "linear-gradient(rgb(41, 11, 39), rgb(212, 46, 201) " + colorPercent + "%)";
+
         platforms[0].remove();
         platforms.shift();
         counter++;
         height--;
     }, 400);
 
+    if((level % 2) != 0 && blocksLeft < 3) {
+        blocksLeft++;
+        setTimeout(addBlock, 2800)
+        setTimeout(() => {
+            setPlatform(blockWidth);
+            unpause(blockWidth, windowWidth, borderWidth); 
+        }, 4200);
+    }
+    else {
+        setTimeout(() => {
+            setPlatform(blockWidth);
+            unpause(blockWidth, windowWidth, borderWidth); 
+        }, 2800);
+    }
+    
+    
+}
+
+function addBlock() {
+    let left = px2num(platforms[0].style.left) + (blockWidth * (blocksLeft - 1 ));
+
+   /* if(left >= windowWidth / 2) {
+        left -= (2 * blockWidth);
+    } */
+
+    let div = document.createElement('div');
+    div.classList.add("child");
+    div.style.position = "absolute";
+    div.style.width = blockWidth + "px";
+    div.style.height = blockWidth + "px";
+    div.style.left = left + "px";
+    div.style.top = platforms[0].style.top;
+    div.style.transition = ".35s";
+    floor.appendChild(div);
+
+    let opaque = true;
+    let count = 0;
+    let interval = window.setInterval(() => {
+        if(count == 4) {
+            clearInterval(interval);
+        }
+        if(opaque) {
+            div.style.opacity = "0";
+            opaque = false;
+        }
+        else {
+            div.style.opacity = "1";
+            opaque = true;
+        }
+
+        count++;
+    }, 350);
+
     setTimeout(() => {
-        setPlatform(blockWidth);
-        unpause(blockWidth, windowWidth, borderWidth); 
-    }, 2800);
+        div.remove();
+        platforms[0].style.width = (px2num(platforms[0].style.width) + blockWidth) + "px";
+        let cell = document.createElement('div');
+        cell.classList.add("child");
+        platforms[0].appendChild(cell);
+    }, 1400);
     
 }
 
 function startGame() {
     let scoreContainer = document.getElementById("score-container");
     let scores = scoreContainer.children;
+    let iconContainer = document.getElementById("icon-container-game");
+    let icons = iconContainer.children;
     
     playButton.style.transition = ".5s";
     playButton.style.opacity = "0";
@@ -555,16 +637,30 @@ function startGame() {
     leaderboard.style.opacity = "0";
     scoreContainer.style.transition = "1s ease-in-out";
     scoreContainer.style.left = "5%";
+    iconContainer.style.transition = "1s ease-in-out";
+    iconContainer.style.right = "7%";
 
     for(let i = 0; i < 2; i++) {
         scores[i].style.transition = "2s";
         scores[i].style.opacity = "1";
     }
 
+    for(let i = 0; i < 3; i++) {
+        icons[i].style.transition = "1s";
+        icons[i].style.opacity = "1";
+    }
+
     window.setTimeout(function() {
         playButton.remove();
         instructions.remove();
         leaderboard.remove();
+
+        //set instructions to new instruction icon
+        document.getElementById("instructions").style.top = "20vh";
+        instructions = document.getElementById("instructions-game");
+        instructions.onclick = openInstructions;
+
+        leaderboard = document.getElementById("leaderboard-game");
     }, 500);
 
     navBar.style.transition = ".7s ease-in-out"
@@ -581,8 +677,20 @@ function startGame() {
         }
     }, 1000);
 
+    setTimeout(function() {
+        for(let i = 0; i < 3; i++) {
+            icons[i].style.transition = "0s";
+        }
+
+        for(let i = 0; i < 2; i++) {
+            scores[i].style.transition = "0s";
+        }
+
+    }, 1000);
+
     resizePlatforms(blockWidth);
     paused = false;
+    loadScreen = false;
     
 }
 
@@ -595,9 +703,17 @@ function openInstructions() {
     background.style.height = "50vh";
     X.style.opacity = "100";
     X.style.cursor = "pointer";
-
-    titleText.style.opacity = "0";
-    playButton.style.opacity = "0";
+    
+    if(loadScreen) {
+        titleText.style.opacity = "0";
+        playButton.style.opacity = "0";
+    }
+    else {
+        restartButton.style.opacity = "0";
+        document.getElementById("score-container").getElementsByTagName('h1')[0].style.opacity = "0";
+        document.getElementById("score-container").getElementsByTagName('h1')[1].style.opacity = "0";
+    }
+    
     leaderboard.style.opacity = "0";
     instructions.style.opacity = "0";
 
@@ -616,8 +732,8 @@ function openInstructions() {
 
 function closeInstructions() {
     unpause(blockWidth, windowWidth, borderWidth);
-    paused = true;
-
+    if(loadScreen) paused = true;
+    
     let background = document.getElementById("instructions");
     let textBox = document.getElementById("textBox");
     let X = document.getElementById("instructionX");
@@ -637,9 +753,43 @@ function closeInstructions() {
         playButton.style.opacity = "100";
         leaderboard.style.opacity = "100";
         instructions.style.opacity = "100";
+        restartButton.style.opacity = "100";
+        
+        document.getElementById("score-container").getElementsByTagName('h1')[0].style.opacity = "100";
+        document.getElementById("score-container").getElementsByTagName('h1')[1].style.opacity = "100";
     }, 200);
 
     X.removeEventListener("click", closeInstructions);
+}
+
+function restartGame() {
+    pause();
+    level = 1;
+    gameSpeed = 150;
+    height = 1;
+    blocksLeft = 3;
+
+    for(let i = 0; i < platforms.length; i++) {
+        platforms[i].remove();
+    }
+
+    base = document.createElement('div');
+    base.style.width = (4 * blockWidth) + "px";
+    base.style.height = blockWidth + "px";
+    base.style.position = "absolute";
+    base.style.top = (-1 * blockWidth) + "px";
+    base.style.left = (windowWidth / 2 - 2 * blockWidth) + "px";
+
+    for(let i = 0; i < 4; i++) {
+        let cell = document.createElement('div');
+        cell.classList.add("child");
+        base.appendChild(cell);
+    }
+
+    platforms.push(base);
+    floor.appendChild(base);
+    setPlatform(blockWidth);
+    unpause(blockWidth, windowWidth, borderWidth);
 }
 
 function gameOver() {
