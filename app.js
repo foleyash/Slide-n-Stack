@@ -462,6 +462,9 @@ function fallInterval(fallingBlocks, blockWidth, last) {
                     unpause(blockWidth, windowWidth, borderWidth);
                 }
             
+            }
+            else {
+                //gameOver function here
             } 
             clearInterval(interval);
         }
@@ -522,15 +525,20 @@ function levelUp() {
         highScore.style.fontStyle = "bold";
         highScore.style.color = "white";
         if(!newHighScore) {
-            highScore.classList.add("shake");
+            let h1 = document.getElementById('new-high-score').getElementsByTagName('h1')[0];
+            h1.style.opacity = "1";
             newHighScore = true;
+
+            setTimeout(() => {
+                h1.style.opacity = "0";
+            }, 1000);
+
         }
     }
 
     setTimeout(function() {
         highScore.style.color = "yellow";
         highScore.style.fontStyle = "normal";
-        highScore.classList.remove("shake");
         currScore.style.color = "yellow";
         currScore.style.fontStyle = "normal";
     }, 1010);
@@ -764,13 +772,19 @@ function closeInstructions() {
 
 function restartGame() {
     pause();
+    currScore.textContent = 1;
     level = 1;
     gameSpeed = 150;
     height = 1;
     blocksLeft = 3;
+    colorPercent = 20;
+    firstBlock = true;
+    newHighScore = false;
 
-    for(let i = 0; i < platforms.length; i++) {
-        platforms[i].remove();
+    let k = platforms.length;
+    for(let i = 0; i < k; i++) {
+        let div = platforms.shift();
+        div.remove();
     }
 
     base = document.createElement('div');

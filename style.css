@@ -51,6 +51,7 @@
     display:inline-block;
     border: solid black 1px;
     background-color: yellow;
+    z-index: 8;
 }
 
 .title-text {
@@ -226,11 +227,22 @@ i#instructionX:hover {
     font-family: 'Bruno Ace SC';
 }
 
-.shake {
-    width: 5px;
-    display: inline-block;
-    transition: 1s;
-    transform:rotate(360deg);
+#new-high-score {
+    position: absolute;
+    top: 30vh;
+    left: 50%;
+    width: 500px;
+    margin-left: -250px;
+    text-align: center;
+    z-index: 9;
+}
+
+#new-high-score h1 {
+    color: white;
+    font-family: "Bruno Ace SC", cursive;
+    opacity: 0;
+    transition: 1s ease-in-out;
+    font-size: 60px;
 }
 
 @media only screen and (max-width: 1660px) {
@@ -253,7 +265,8 @@ i#instructionX:hover {
     }
 }
 
-@media only screen and (max-width: 1256px) {
+@media only screen and (max-width: 1256px),
+        screen and (max-height: 1000px) {
     #base {
         width:240px;
         height: 60px;
@@ -297,18 +310,22 @@ i#instructionX:hover {
         font-size: 50px;
         margin: 0 15px;
     }
+
+    #new-high-score h1 {
+        font-size: 50px;
+    }
 }
 
 @media only screen and (max-width: 768px),
         screen and (max-height: 800px) {
     #base {
-        width:120px;
-        height: 30px;
-        top:-30px;
+        width:160px;
+        height: 40px;
+        top:-40px;
     }
 
     .child {
-        width: 30px;
+        width: 40px;
     }
 
     .title-text {
@@ -354,6 +371,10 @@ i#instructionX:hover {
     #icon-container-game i {
         font-size: 36px;
         margin: 0 10px;
+    }
+
+    #new-high-score h1 {
+        font-size: 36px;
     }
 }
 
@@ -417,6 +438,9 @@ i#instructionX:hover {
         margin: 0 6px;
     }
 
+    #new-high-score h1 {
+        font-size: 24px;
+    }
 }
 @media only screen and (max-width: 400px) {
     #base {
@@ -476,6 +500,10 @@ i#instructionX:hover {
     #icon-container-game i {
         font-size: 16px;
         margin: 0 4px;
+    }
+
+    #new-high-score h1 {
+        font-size: 18px;
     }
 }
 
