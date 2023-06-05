@@ -64,22 +64,28 @@ var borderWidth = getBorderWidth();
 
 //use width of window to set side borders
 
-setBorders();
-setPlatform(blockWidth);
+setBorders(borderWidth);
+setPlatform(blockWidth, borderWidth);
 
+//start moving the platform from right to left
 var moveInterval = window.setInterval(() => {
     movePlatform(blockWidth, windowWidth, borderWidth);
 }, gameSpeed);
 
+
+// **** EVENT LISTENERS BELOW ****
+
 window.onresize = () => {
+
+    pause();
     blockWidth = getChildWidth();
     windowWidth = getWindowWidth();
     borderWidth = getBorderWidth();
-    setBorders();
-    resizePlatforms(blockWidth);
+    setBorders(borderWidth);
+    resizePlatforms(blockWidth, borderWidth);
+    unpause(blockWidth, windowWidth, borderWidth);
+     
 }
-
-//EVENT LISTENERS BELOW ****
 
 document.addEventListener("keypress", function(e) {
     e.preventDefault();
@@ -151,8 +157,7 @@ function blocksInWindow() {
     return blocks;
 }
 
-function setBorders() {
-    let borderWidth = getBorderWidth();
+function setBorders(borderWidth) {
 
     let leftBorder = document.getElementById("left-border");
     let rightBorder = document.getElementById("right-border");
@@ -184,7 +189,7 @@ function getBorderWidth() {
 }
 
 
-function setPlatform(blockWidth) {
+function setPlatform(blockWidth, borderWidth) {
 
     ++height;
 
@@ -193,7 +198,6 @@ function setPlatform(blockWidth) {
     container.style.width = (blockWidth*blocksLeft) + "px";
     container.style.height = blockWidth + "px";
     container.style.top = (-1 * height * blockWidth) + "px";
-    let borderWidth = getBorderWidth();
     container.style.left = borderWidth + "px";
 
     for(let i = 0; i < blocksLeft; i++) {
@@ -207,7 +211,7 @@ function setPlatform(blockWidth) {
 
 }
 
-function resizePlatforms(childWidth) {
+function resizePlatforms(childWidth, borderWidth) {
     for(let i = 0; i < platforms.length; i++) {
         if(i == 0) {
             platforms[i].style.left = (getWindowWidth() / 2 - 2 * childWidth) + "px";
@@ -216,7 +220,6 @@ function resizePlatforms(childWidth) {
         platforms[i].style.height = childWidth + "px";
         platforms[i].style.width = (childWidth*blocksLeft) + "px";
         platforms[i].style.top = (-1 * (i + 1) * childWidth) + "px";
-        let borderWidth = getBorderWidth();
         platforms[i].style.left = borderWidth + "px";
     }
 }
@@ -262,7 +265,7 @@ function dropPlatform(firstBlock, blockWidth) {
             levelUp();
         }
         else {
-            setPlatform(blockWidth);
+            setPlatform(blockWidth, borderWidth);
         }
         
     }
@@ -458,7 +461,7 @@ function fallInterval(fallingBlocks, blockWidth, last) {
                     levelUp();
                 }
                 else {
-                    setPlatform(blockWidth);
+                    setPlatform(blockWidth, borderWidth);
                     unpause(blockWidth, windowWidth, borderWidth);
                 }
             
@@ -572,13 +575,13 @@ function levelUp() {
         blocksLeft++;
         setTimeout(addBlock, 2800)
         setTimeout(() => {
-            setPlatform(blockWidth);
+            setPlatform(blockWidth, borderWidth);
             unpause(blockWidth, windowWidth, borderWidth); 
         }, 4200);
     }
     else {
         setTimeout(() => {
-            setPlatform(blockWidth);
+            setPlatform(blockWidth, borderWidth);
             unpause(blockWidth, windowWidth, borderWidth); 
         }, 2800);
     }
@@ -802,7 +805,7 @@ function restartGame() {
 
     platforms.push(base);
     floor.appendChild(base);
-    setPlatform(blockWidth);
+    setPlatform(blockWidth, borderWidth);
     unpause(blockWidth, windowWidth, borderWidth);
 }
 
