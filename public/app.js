@@ -468,6 +468,10 @@ function fallInterval(fallingBlocks, blockWidth, last) {
             }
             else {
                 //gameOver function here
+
+                //post the scores of the user to server.js
+                postScore();
+                
             } 
             clearInterval(interval);
         }
@@ -809,10 +813,31 @@ function restartGame() {
     unpause(blockWidth, windowWidth, borderWidth);
 }
 
-function gameOver() {
-
+function gameFinished() {
+    //Create UI effects for gameover
+    
 }
 
+//REQUIRES: User is logged in to their account
+//EFFECTS: Sends a POST request to the server with the user's final score data
+async function postScore() {
+    //If the user is logged in, take the user's final score and create a POST request to be evaluated 
+    //in the server.js api
+    const extraBlocks = height - 2;
+    const userScore = {level, extraBlocks};
+
+    //JSON object to be passed into api
+    const options = {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(userScore)
+    }
+    fetch('/api', options).then((response) => console.log(response.json()));
+}
+
+//EFFECTS: Stops the moveInterval which pauses the game
 function pause() {
     
     clearInterval(moveInterval); 
@@ -820,6 +845,7 @@ function pause() {
 
 }
 
+//EFFECTS: Activates the moveInterval with gameSpeed frequency which unpauses the game
 function unpause(blockWidth, windowWidth, borderWidth) {
     
         moveInterval = window.setInterval(() => {
