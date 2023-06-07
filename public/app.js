@@ -468,7 +468,7 @@ function fallInterval(fallingBlocks, blockWidth, last) {
             }
             else {
                 //gameOver function here
-
+                
                 //post the scores of the user to server.js
                 postScore();
                 
@@ -834,7 +834,17 @@ async function postScore() {
         },
         body: JSON.stringify(userScore)
     }
-    fetch('/api', options).then((response) => console.log(response.json()));
+    await fetch('/api/store', options).then((response) => console.log(response.json()));
+}
+
+//EFFECTS: Retrieves the top 10 scores from the database and populates the leaderboard with the data
+async function getTopScores() {
+    //Retrieve the top 10 scores from the database in the form of a JSON object
+    const response = await fetch('/api/retrieve');
+    const data = await response.json();
+
+    //Convert the JSON object into an array of objects
+    const scores = JSON.parse(data);
 }
 
 //EFFECTS: Stops the moveInterval which pauses the game

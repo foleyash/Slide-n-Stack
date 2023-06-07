@@ -1,12 +1,23 @@
 
 import express from 'express'
+
 const app = express()
 
 app.use(express.static('public'));
 app.use(express.json({limit: '1mb'}));
 
-app.post('/api', (req, res) => {
+//GET request which allows the client to retrieve the scores of the top 10 players as well as their own score
+app.get('/api/retrieve', (req, res) => {
+    
+});
+
+//POST request which allows the client to store their score in the database
+app.post('/api/store', (req, res) => {
+
+    //Add the level and extra blocks to database if it is higher than the user's current high score
     console.log(req.body);
+
+    //Return a resonse to the client with the level and extra blocks
     res.json({
         status: "success",
         level: req.body.level,

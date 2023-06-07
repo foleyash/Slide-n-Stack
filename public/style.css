@@ -372,7 +372,10 @@ i#instructionX:hover {
         font-size: 36px;
         margin: 0 10px;
     }
-
+    #new-high-score {
+        width: 120px;
+        margin-left:-60px;
+    }
     #new-high-score h1 {
         font-size: 36px;
     }

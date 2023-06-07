@@ -42,6 +42,47 @@ export async function createNewUser(user_name, user_pass) {
     INSERT INTO users (user_id, placement)
     VALUES (?, ?)
     `, [id, id])
+
+}
+
+//REQUIRES: users is a valid array of the loginInformation objects including user_id, user_name, and user_pass
+//EFFFECTS: returns an array of objects of the top 10 or less users and their respective placements and scores
+export async function getTopScore(users) {
+    let topScores = [];
+    for(let i = 0; i < users.length; i++) {
+
+        const id = users[i].user_id;
+     
+        const userInfo = await getUserInformation(id);
+        const placement = await userInfo.placement;
+        
+        if(placement <= 10) {
+            let user = {
+                user_name: users[i].user_name,
+                placement: placement,
+                high_level: await userInfo.high_level,
+                extra_platforms: await userInfo.extra_platforms
+            };
+            
+            if(topScores.length === 0) topScores.push(user);
+            else {
+                topScores.push(user);
+                for(let j = topScores.length - 2; j >= 0; j--) {
+                    if(topScores[j].placement > topScores[j + 1].placement) {
+                        let temp = topScores[j];
+                        topScores[j] = topScores[j + 1];
+                        topScores[j + 1] = temp;
+                    }
+                    else {
+                        break;
+                    }
+                }
+            
+            }
+        }
+    }
+
+    return topScores;
 }
 
 /* Additional functions to create:
@@ -51,10 +92,9 @@ export async function createNewUser(user_name, user_pass) {
 
     
 */
+const loginInfo = await getLoginInformation();
+const topScores = await getTopScore(loginInfo);
+console.log(topScores);
 
-const loginInfo = await getLoginInformation()
-const userInfo = await getUserInformation(1)
-const insert = await createNewUser('foleya', 'password')
 
-console.log(insert)
 
