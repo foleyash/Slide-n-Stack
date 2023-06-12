@@ -713,7 +713,7 @@ function startGame() {
     
 }
 
-async function openInstructions() {
+function openInstructions() {
     pause();
     let background = document.getElementById("instructions");
     let textBox = document.getElementById("textBox");
@@ -833,6 +833,7 @@ function openLeaderboard() {
     restartButton.style.cursor = "auto";
     instructions.style.cursor = "auto";
     leaderboard.style.cursor = "auto";
+
 }
 
 function closeLeaderboard() {
@@ -857,7 +858,6 @@ function closeLeaderboard() {
     let X = document.getElementById("leaderboardX");
 
     background.style.height = '0';
-    
 
     setTimeout(function() {
         background.getElementsByTagName('h1')[0].style.opacity = "0";
@@ -938,7 +938,9 @@ async function postScore() {
         },
         body: JSON.stringify(userScore)
     }
-    await fetch('/api/store', options).then((response) => {console.log(response.json())});
+    const response = await fetch('/api/updateScore', options)
+    const data = await response.json();
+    console.log(data);
 }
 
 //EFFECTS: Retrieves the top 10 scores from the database and populates the leaderboard with the data
@@ -952,11 +954,9 @@ async function getTopScores() {
         body: JSON.stringify()
     }
     //Retrieve the top 10 scores from the database in the form of a JSON object
-    const response = await fetch('/api/retrieve');
+    const response = await fetch('/api/retrieveLeaderboards');
     const data = await response.json();
-
-    //Convert the JSON object into an array of objects
-    const scores = JSON.parse(data);
+    console.log(data.topScores);
 
     return scores;
 }
