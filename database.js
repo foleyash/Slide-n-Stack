@@ -3,14 +3,14 @@ import mysql from 'mysql2'
 import dotenv from 'dotenv'
 dotenv.config()
 
-const pool = mysql.createPool({
+export const pool = mysql.createPool({
     host: process.env.MYSQL_HOST,
     user: process.env.MYSQL_USER,
     password: process.env.MYSQL_PASSWORD,
     database: process.env.MYSQL_DATABASE
 }).promise()
 
-export async function getLoginInformation() {
+export async function getLoginInformation(pool) {
     const [login_info] = await pool.query("SELECT * FROM login_user")
 
     return login_info
@@ -47,7 +47,7 @@ export async function createNewUser(user_name, user_pass) {
 
 //REQUIRES: users is a valid array of the loginInformation objects including user_id, user_name, and user_pass
 //EFFFECTS: returns an array of objects of the top 10 or less users and their respective placements and scores
-export async function getTopScore(users) {
+export async function getBestScores(users) {
     let topScores = [];
     for(let i = 0; i < users.length; i++) {
 
@@ -92,9 +92,9 @@ export async function getTopScore(users) {
 
     
 */
-const loginInfo = await getLoginInformation();
-const topScores = await getTopScore(loginInfo);
-console.log(topScores);
+const loginInfo = await getLoginInformation(pool);
+const topScores = await getBestScores(loginInfo);
+//console.log(topScores);
 
 
 

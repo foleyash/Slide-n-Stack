@@ -48,14 +48,6 @@ let lavaInterval = window.setInterval(function() {
     }
 }, 50); 
 
-//icon features for leaderboard, instructions, and play game at start
-
-playButton.onclick = startGame;
-
-instructions.onclick = openInstructions;
-
-restartButton.onclick = restartGame;
-
 //retrieve the width of child block, window, and border
 
 var blockWidth = getChildWidth();
@@ -75,8 +67,18 @@ var moveInterval = window.setInterval(() => {
 
 // **** EVENT LISTENERS BELOW ****
 
-window.onresize = () => {
+//icon features for leaderboard, instructions, and play game at start
 
+playButton.addEventListener("click", startGame, false);
+
+instructions.addEventListener("click", openInstructions, false);
+
+restartButton.addEventListener("click", restartGame, false);
+
+leaderboard.addEventListener("click", openLeaderboard, false);
+
+window.onresize = () => {
+    
     pause();
     blockWidth = getChildWidth();
     windowWidth = getWindowWidth();
@@ -673,7 +675,9 @@ function startGame() {
         //set instructions to new instruction icon
         document.getElementById("instructions").style.top = "20vh";
         instructions = document.getElementById("instructions-game");
-        instructions.onclick = openInstructions;
+        instructions.addEventListener("click", openInstructions, false);
+        leaderboard = document.getElementById("leaderboard-game");
+        leaderboard.addEventListener("click", openLeaderboard, false);
 
         leaderboard = document.getElementById("leaderboard-game");
     }, 500);
@@ -709,7 +713,7 @@ function startGame() {
     
 }
 
-function openInstructions() {
+async function openInstructions() {
     pause();
     let background = document.getElementById("instructions");
     let textBox = document.getElementById("textBox");
@@ -742,6 +746,12 @@ function openInstructions() {
     }, 220)
 
     X.addEventListener("click", closeInstructions);
+    restartButton.removeEventListener("click", restartGame, false);
+    instructions.removeEventListener("click", openInstructions, false);
+    leaderboard.removeEventListener("click", openLeaderboard, false);
+    restartButton.style.cursor = "auto";
+    instructions.style.cursor = "auto";
+    leaderboard.style.cursor = "auto";
 
 }
 
@@ -775,9 +785,103 @@ function closeInstructions() {
     }, 200);
 
     X.removeEventListener("click", closeInstructions);
+    restartButton.addEventListener("click", restartGame, false);
+    instructions.addEventListener("click", openInstructions, false);
+    leaderboard.addEventListener("click", openLeaderboard, false);
+    restartButton.style.cursor = "pointer";
+    instructions.style.cursor = "pointer";
+    leaderboard.style.cursor = "pointer";
 }
 
-function restartGame() {
+function openLeaderboard() {
+    pause();
+    let background = document.getElementById("leaderboard");
+    let topScores = document.getElementById("top-scores");
+    let X = document.getElementById("leaderboardX");
+
+    background.style.height = "50vh";
+    topScores.style.border = "white solid 2px";
+    X.style.opacity = "100";
+    X.style.cursor = "pointer";
+    
+    if(loadScreen) {
+        titleText.style.opacity = "0";
+        playButton.style.opacity = "0";
+    }
+    else {
+        restartButton.style.opacity = "0";
+        document.getElementById("score-container").getElementsByTagName('h1')[0].style.opacity = "0";
+        document.getElementById("score-container").getElementsByTagName('h1')[1].style.opacity = "0";
+    }
+
+    leaderboard.style.opacity = "0";
+    instructions.style.opacity = "0";
+
+    setTimeout(function() {
+        background.getElementsByTagName('h1')[0].style.opacity = "1";
+        
+    }, 140);
+
+    setTimeout(function() {
+        textBox.getElementsByTagName('p')[1].style.opacity = "100";
+    }, 220)
+
+    X.addEventListener("click", closeLeaderboard);
+    restartButton.removeEventListener("click", restartGame, false);
+    instructions.removeEventListener("click", openInstructions, false);
+    leaderboard.removeEventListener("click", openLeaderboard, false);
+    restartButton.style.cursor = "auto";
+    instructions.style.cursor = "auto";
+    leaderboard.style.cursor = "auto";
+}
+
+function closeLeaderboard() {
+    unpause(blockWidth, windowWidth, borderWidth);
+    if(loadScreen) {
+        paused = true;
+        setTimeout(() => {
+            titleText.style.opacity = "1";
+            playButton.style.opacity = "1";
+        }, 220);
+    }
+    else {
+        setTimeout(() => {
+            restartButton.style.opacity = "1";
+            document.getElementById("score-container").getElementsByTagName('h1')[0].style.opacity = "1";
+            document.getElementById("score-container").getElementsByTagName('h1')[1].style.opacity = "1";
+        }, 220);
+    }
+
+    let background = document.getElementById("leaderboard");
+    let topScores = document.getElementById("top-scores");
+    let X = document.getElementById("leaderboardX");
+
+    background.style.height = '0';
+    
+
+    setTimeout(function() {
+        background.getElementsByTagName('h1')[0].style.opacity = "0";
+    }, 140);
+
+    setTimeout(function() {
+        topScores.style.border = "none";
+        X.style.opacity = "0";
+        X.style.cursor = "auto";
+        leaderboard.style.opacity = "1";
+        instructions.style.opacity = "1";
+    }, 220);
+
+    X.removeEventListener("click", closeLeaderboard);
+
+    restartButton.addEventListener("click", restartGame, false);
+    instructions.addEventListener("click", openInstructions, false);
+    leaderboard.addEventListener("click", openLeaderboard, false);
+    restartButton.style.cursor = "pointer";
+    instructions.style.cursor = "pointer";
+    leaderboard.style.cursor = "pointer";
+}
+
+async function restartGame() {
     pause();
     currScore.textContent = 1;
     level = 1;
@@ -834,17 +938,27 @@ async function postScore() {
         },
         body: JSON.stringify(userScore)
     }
-    await fetch('/api/store', options).then((response) => console.log(response.json()));
+    await fetch('/api/store', options).then((response) => {console.log(response.json())});
 }
 
 //EFFECTS: Retrieves the top 10 scores from the database and populates the leaderboard with the data
 async function getTopScores() {
+
+    const options = {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify()
+    }
     //Retrieve the top 10 scores from the database in the form of a JSON object
     const response = await fetch('/api/retrieve');
     const data = await response.json();
 
     //Convert the JSON object into an array of objects
     const scores = JSON.parse(data);
+
+    return scores;
 }
 
 //EFFECTS: Stops the moveInterval which pauses the game

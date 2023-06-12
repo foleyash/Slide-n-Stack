@@ -167,7 +167,7 @@
 }
 
 #textBox {
-    background-color: #F9E1B1;
+    background-color: #15aa35;
     height: 90%;
     width: 95%;
     position: absolute;
@@ -192,22 +192,24 @@ i#instructionX:hover {
 }
 
 #textBox h1 {
-    margin-top: 10%;
-    font-size: 28px;
+    margin-top: 5%;
+    font-size: 36px;
     opacity: 0;
     margin-left: 5%;
     margin-right: 5%;
     font-family: 'Bruno Ace SC', cursive;
+    color: yellow;
 }
 
 #textBox p {
     margin-top: 5%;
     margin-bottom: 5%;
-    font-size: 20px;
+    font-size: 24px;
     opacity: 0;
     margin-left: 5%;
     margin-right: 5%;
     font-family: 'Bruno Ace SC', cursive;
+    color: yellow;
 }
 
 #score-container {
@@ -243,6 +245,74 @@ i#instructionX:hover {
     opacity: 0;
     transition: 1s ease-in-out;
     font-size: 60px;
+}
+
+#leaderboard {
+    background-color: black;
+    width: 50%;
+    height: 0;
+    position: absolute;
+    left:50%;
+    margin-left: -25%;
+    top:20vh;
+    transition: .5s;
+    z-index: 10;
+    border: 0px solid black;
+    border-radius: 15px;
+    text-align: center;
+}
+
+#leaderboardX {
+    position: absolute;
+    right:0;
+    margin-right: 5%;
+    margin-top: 3%;
+    font-size: 42px;
+    opacity: 0;
+}
+
+#leaderboard h1 {
+    margin-top: 4%;
+    font-size: 28px;
+    opacity: 0;
+    margin-left: 5%;
+    margin-right: 5%;
+    font-family: 'Bruno Ace SC', cursive;
+    color: yellow;
+}
+
+#top-scores {
+    background-color: #15aa35;
+    height: 60%;
+    width: 90%;
+    position: absolute;
+    left: 5%;
+    top:20%;
+    text-align: center;
+    overflow-y: auto;
+    display:flex;
+}
+
+#top-scores div {
+    width: 100%;
+}
+
+#leaderboard-stats-container {
+    width: 100%;
+    height: 16.66%;
+    display:flex;
+    align-items: center;
+    justify-content: center;   
+}
+
+#leaderboard-stats-container div {
+    border: 2px solid yellow;
+    text-align:center;
+    width: 33%;
+    height: fit-content;
+    font-family: 'Bruno Ace SC', cursive;
+    font-size: 24px;
+    color: yellow;
 }
 
 @media only screen and (max-width: 1660px) {
@@ -294,12 +364,12 @@ i#instructionX:hover {
     }
 
     #textBox h1 {
-        font-size: 20px;
-        margin-top: 15%;
+        font-size: 24px;
+        margin-top: 10%;
     }
 
     #textBox p {
-        font-size: 14px;
+        font-size: 18px;
     }
 
     #score-container h1 {
@@ -313,6 +383,10 @@ i#instructionX:hover {
 
     #new-high-score h1 {
         font-size: 50px;
+    }
+
+    #leaderboard-stats-container div {
+        font-size: 18px;
     }
 }
 
@@ -350,6 +424,7 @@ i#instructionX:hover {
 
     #textBox h1 {
         font-size: 18px;
+        margin-top: 15%;
     }
 
     #textBox p {
@@ -378,6 +453,9 @@ i#instructionX:hover {
     }
     #new-high-score h1 {
         font-size: 36px;
+    }
+    #leaderboard-stats-container div {
+        font-size: 14px;
     }
 }
 
@@ -443,6 +521,10 @@ i#instructionX:hover {
 
     #new-high-score h1 {
         font-size: 24px;
+    }
+
+    #leaderboard-stats-container div {
+        font-size: 10px;
     }
 }
 @media only screen and (max-width: 400px) {
