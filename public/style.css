@@ -245,6 +245,7 @@ i#instructionX:hover {
     opacity: 0;
     transition: 1s ease-in-out;
     font-size: 60px;
+    
 }
 
 #leaderboard {
@@ -260,6 +261,8 @@ i#instructionX:hover {
     border: 0px solid black;
     border-radius: 15px;
     text-align: center;
+    overflow-y:scroll;
+    overflow-x:hidden;
 }
 
 #leaderboardX {
@@ -271,7 +274,7 @@ i#instructionX:hover {
     opacity: 0;
 }
 
-#leaderboard h1 {
+#leaderboard-title {
     margin-top: 4%;
     font-size: 28px;
     opacity: 0;
@@ -313,6 +316,70 @@ i#instructionX:hover {
     font-family: 'Bruno Ace SC', cursive;
     font-size: 24px;
     color: yellow;
+}
+
+#login-portal {
+    width: 400px;
+    margin-left: -200px;
+    height: 90%;
+    position: absolute;
+    top: 5%;
+    left: 150%;
+    transition: .5s;
+    z-index: 10;
+    border: 2px solid yellow;
+    background-color: black;
+    border-radius: 15px;
+    padding: 50px 30px;
+}
+
+#login-portal h1 {
+    color: white;
+    font-family: "Bruno Ace SC", cursive;
+    padding-bottom: 10px;
+    text-align: center;
+    font-size: 28px;
+}
+
+#login-portal p {
+    color: white;
+    font-family: "Bruno Ace SC", cursive;
+    font-size: 14px;
+    margin: 5px;
+}
+
+#login-portal a {
+    color: yellow;
+    font-family: "Bruno Ace SC", cursive;
+    font-size: 14px;
+    text-decoration: none;
+}
+
+#login-portal input {
+    width: 100%;
+    margin-bottom: 20px;
+    font-family: "Bruno Ace SC", cursive;
+}
+
+#login-portal input[type="text"], input[type="password"] {
+    border: none;
+    border-bottom: 1px solid #fff;
+    background: transparent;
+    outline: none;
+    height: 40px;
+    color: #fff;
+    font-size: 16px;
+    z-index: 1000;
+}
+
+#login-portal input[type="submit"] {
+    border: none;
+    outline: none;
+    height: 40px;
+    background: #fb2525;
+    color: #fff;
+    font-size: 18px;
+    margin-bottom: 10px;
 }
 
 @media only screen and (max-width: 1660px) {

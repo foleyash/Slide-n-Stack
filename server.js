@@ -36,7 +36,11 @@ app.post('/api/updateScore', (req, res) => {
     });
 });
 
-app.post('/api/createUser', async (req, res) => {
+app.post('/api/authenticate', async (req, res) => {
+
+});
+
+app.post('/api/register', async (req, res) => {
     try {
         const salt = await bcrypt.genSalt();
         const hashedPassword = await bcrypt.hash(req.body.password, salt);

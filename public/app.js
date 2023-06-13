@@ -26,6 +26,13 @@ var gameOver = false;
 var newHighScore = false;
 var loadScreen = true;
 
+//user authentication local variables
+var username = "";
+var loggedIn = false;
+var viewedPortal = false;
+var closeLoginPortalButton = document.getElementById("login-portal").getElementsByTagName("a")[0];
+var forgotPassButton = document.getElementById("login-portal").getElementsByTagName("a")[1];
+var signUpButton = document.getElementById("login-portal").getElementsByTagName("a")[2];
 
 let lavaInterval = window.setInterval(function() {
     if(wave_up) {
@@ -77,6 +84,8 @@ restartButton.addEventListener("click", restartGame, false);
 
 leaderboard.addEventListener("click", openLeaderboard, false);
 
+closeLoginPortalButton.onclick = closeLoginPortal;
+
 window.onresize = () => {
     
     pause();
@@ -90,9 +99,12 @@ window.onresize = () => {
 }
 
 document.addEventListener("keypress", function(e) {
-    e.preventDefault();
+    
     if(paused) {
         return;
+    }
+    else {
+        e.preventDefault();
     }
     if(e.keycode == 32 ||
         e.code == "Space" ||
@@ -834,6 +846,21 @@ function openLeaderboard() {
     instructions.style.cursor = "auto";
     leaderboard.style.cursor = "auto";
 
+    if(!loggedIn && !viewedPortal) {
+        let portal = document.getElementById("login-portal");
+
+        setTimeout(function() {
+            portal.style.left = "40%";            
+        }, 600);
+
+        setTimeout(function() {
+            portal.style.transition = ".3";
+            portal.style.left = "50%";            
+        }, 1100)
+
+        viewedPortal = true;
+    }
+
 }
 
 function closeLeaderboard() {
@@ -922,6 +949,60 @@ function gameFinished() {
     
 }
 
+function closeLoginPortal() {
+    const portal = document.getElementById("login-portal");
+    portal.style.left = "40%";
+    setTimeout(function() {
+        portal.style.transition = ".5s";
+        portal.style.left = "150%";
+    }, 300);
+    
+}
+
+//EFFECTS: Verifies the user's login credentials and logs them in if they are correct
+async function authenticateUser(user_name, user_pass) {
+    
+    const user = {user_name, user_pass};
+
+    //JSON object to be passed into api
+    const options = {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(user)
+    };
+
+    const response = await fetch('/api/authenticate', options);
+    const data = await response.json();
+    console.log(data);
+}
+
+//EFFECTS: Registers a new user to the database with a unique user_name
+async function registerUser(user_name, user_pass) {
+    if(user_name.length > 50) {
+        console.log("Username is too long");
+    }
+    else if(user_pass.length > 50) {
+        console.log("Password is too long");
+    }
+    
+    const user = {user_name, user_pass};
+
+    //JSON object to be passed into api
+    const options = {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(user)
+    };
+
+    const response = await fetch('/api/register', options);
+    const data = await response.json();
+    console.log(data);
+}
+
 //REQUIRES: User is logged in to their account
 //EFFECTS: Sends a POST request to the server with the user's final score data
 async function postScore() {
@@ -951,9 +1032,9 @@ async function getTopScores() {
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify()
+        body: JSON.stringify({})
     }
-    //Retrieve the top 10 scores from the database in the form of a JSON object
+    //Retrieve the top 10 scores from the database and your own score
     const response = await fetch('/api/retrieveLeaderboards');
     const data = await response.json();
     console.log(data.topScores);
