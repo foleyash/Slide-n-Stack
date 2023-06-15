@@ -36,8 +36,23 @@ app.post('/api/updateScore', (req, res) => {
     });
 });
 
+//REQURIES: req.body contains a username and password
+//EFFECTS: returns a 200 status if the user is authenticated, 401 status if the user is not authenticated
 app.post('/api/authenticate', async (req, res) => {
-
+    const user = await database.getUser(req.body.username, database.pool);
+    if(user == null) {
+        return res.status(401).send("Cannot find user");
+    }
+    try {
+        if(await bcrypt.compare(req.body.password, user.user_pass)) {
+            res.status(200).send();
+        }
+        else {
+            res.status(401).send();
+        }
+    } catch {
+        res.status(500).send();
+    }
 });
 
 app.post('/api/register', async (req, res) => {

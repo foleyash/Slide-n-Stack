@@ -167,7 +167,7 @@
 }
 
 #textBox {
-    background-color: #15aa35;
+    background-color: #fb2525;
     height: 90%;
     width: 95%;
     position: absolute;
@@ -175,7 +175,7 @@
     top:5%;
     border-radius: 15px;
     text-align: center;
-    overflow-y: auto;
+    overflow-y: hidden;
 }
 
 #instructionX {
@@ -187,7 +187,7 @@
     opacity: 0;
 }
 
-i#instructionX:hover {
+#instructionX:hover {
     font-size: 46px;
 }
 
@@ -258,10 +258,10 @@ i#instructionX:hover {
     top:20vh;
     transition: .5s;
     z-index: 10;
-    border: 0px solid black;
+    border: 0px solid yellow;
     border-radius: 15px;
     text-align: center;
-    overflow-y:scroll;
+    overflow-y: hidden;
     overflow-x:hidden;
 }
 
@@ -272,6 +272,10 @@ i#instructionX:hover {
     margin-top: 3%;
     font-size: 42px;
     opacity: 0;
+}
+
+#leaderboardX:hover {
+    font-size: 46px;
 }
 
 #leaderboard-title {
@@ -285,7 +289,7 @@ i#instructionX:hover {
 }
 
 #top-scores {
-    background-color: #15aa35;
+    background-color: #fb2525;
     height: 60%;
     width: 90%;
     position: absolute;
@@ -305,7 +309,7 @@ i#instructionX:hover {
     height: 16.66%;
     display:flex;
     align-items: center;
-    justify-content: center;   
+    justify-content: center;  
 }
 
 #leaderboard-stats-container div {
@@ -316,6 +320,8 @@ i#instructionX:hover {
     font-family: 'Bruno Ace SC', cursive;
     font-size: 24px;
     color: yellow;
+    padding-top: 5px;
+    padding-bottom: 5px; 
 }
 
 #login-portal {
@@ -324,13 +330,19 @@ i#instructionX:hover {
     height: 90%;
     position: absolute;
     top: 5%;
-    left: 150%;
-    transition: .5s;
+    left: 200%;
+    transition: .4s;
     z-index: 10;
     border: 2px solid yellow;
     background-color: black;
     border-radius: 15px;
     padding: 50px 30px;
+    overflow-y: auto;
+    scrollbar-width: none; 
+}
+
+ #login-portal::-webkit-scrollbar {
+    display:none;
 }
 
 #login-portal h1 {
@@ -380,6 +392,101 @@ i#instructionX:hover {
     color: #fff;
     font-size: 18px;
     margin-bottom: 10px;
+    cursor: pointer;
+}
+
+#login-button-container {
+    border: 2px solid white;
+    position: absolute;
+    top: 85%;
+    width: 90%;
+    left: 5%;
+    height: 10%;
+}
+
+#login-button-container p {
+    color: white;
+    font-family: "Bruno Ace SC", cursive;
+    position:absolute;
+    top: 50%;
+    transform: translate(0px, -50%);
+    width: 100%;
+}
+
+#login-button-container a {
+    text-decoration: none;
+    color: yellow;
+}
+
+#register-portal {
+    width: 400px;
+    margin-left: -200px;
+    height: 90%;
+    position: absolute;
+    top: 5%;
+    left: -100%;
+    transition: .4s;
+    z-index: 10;
+    border: 2px solid yellow;
+    background-color: black;
+    border-radius: 15px;
+    padding: 50px 30px;
+    overflow-y: auto;
+    scrollbar-width: none; 
+}
+
+#register-portal::-webkit-scrollbar {
+    display:none;
+}
+
+#register-portal h1 {
+    color: white;
+    font-family: "Bruno Ace SC", cursive;
+    padding-bottom: 10px;
+    text-align: center;
+    font-size: 28px;
+}
+
+#register-portal p {
+    color: white;
+    font-family: "Bruno Ace SC", cursive;
+    font-size: 14px;
+    margin: 5px;
+}
+
+#register-portal a {
+    color: yellow;
+    font-family: "Bruno Ace SC", cursive;
+    font-size: 14px;
+    text-decoration: none;
+}
+
+#register-portal input {
+    width: 100%;
+    margin-bottom: 15px;
+    font-family: "Bruno Ace SC", cursive;
+}
+
+#register-portal input[type="text"], input[type="password"], input[type="email"] {
+    border: none;
+    border-bottom: 1px solid #fff;
+    background: transparent;
+    outline: none;
+    height: 40px;
+    color: #fff;
+    font-size: 16px;
+    z-index: 1000;
+}
+
+#register-portal input[type="submit"] {
+    border: none;
+    outline: none;
+    height: 40px;
+    background: #fb2525;
+    color: #fff;
+    font-size: 18px;
+    margin-bottom: 10px;
+    cursor: pointer;
 }
 
 @media only screen and (max-width: 1660px) {
@@ -455,6 +562,7 @@ i#instructionX:hover {
     #leaderboard-stats-container div {
         font-size: 18px;
     }
+
 }
 
 @media only screen and (max-width: 768px),
@@ -524,6 +632,57 @@ i#instructionX:hover {
     #leaderboard-stats-container div {
         font-size: 14px;
     }
+
+    #leaderboardX {
+        font-size: 30px;
+    }
+
+    #leaderboardX:hover {
+        font-size: 38px;
+    }
+
+    #login-portal {
+        width: 240px;
+        margin-left: -120px;
+    }
+
+    #login-portal h1 {
+        font-size: 24px;
+    }
+
+    #login-portal p {
+        font-size: 14px;
+    }
+
+    #login-portal a {
+        font-size: 14px;
+    }
+
+    #login-portal input[type="text"], input[type="password"] {
+        font-size: 14px;
+    }
+
+    #register-portal {
+        width: 240px;
+        margin-left: -120px;
+    }
+
+    #register-portal h1 {
+        font-size: 24px;
+    }
+
+    #register-portal p {
+        font-size: 14px;
+    }
+
+    #register-portal a {
+        font-size: 14px;
+    }
+
+    #register-portal input[type="text"], input[type="password"] {
+        font-size: 14px;
+    }
+
 }
 
 @media only screen and (max-width: 575px),
@@ -568,6 +727,14 @@ i#instructionX:hover {
         font-size: 32px;
     }
 
+    #leaderboardX {
+        font-size: 28px;
+    }
+
+    #leaderboardX:hover {
+        font-size: 32px;
+    }
+
     #textBox h1 {
         margin-top: 20%;
         font-size: 14px;
@@ -592,6 +759,48 @@ i#instructionX:hover {
 
     #leaderboard-stats-container div {
         font-size: 10px;
+    }
+
+    #login-portal {
+        width: 200px;
+        margin-left: -100px;
+    }
+
+    #login-portal h1 {
+        font-size: 20px;
+    }
+
+    #login-portal p {
+        font-size: 12px;
+    }
+
+    #login-portal a {
+        font-size: 12px;
+    }
+
+    #login-portal input[type="text"], input[type="password"] {
+        font-size: 12px;
+    }
+
+    #register-portal {
+        width: 200px;
+        margin-left: -100px;
+    }
+
+    #register-portal h1 {
+        font-size: 20px;
+    }
+
+    #register-portal p {
+        font-size: 12px;
+    }
+
+    #register-portal a {
+        font-size: 12px;
+    }
+
+    #register-portal input[type="text"], input[type="password"] {
+        font-size: 12px;
     }
 }
 @media only screen and (max-width: 400px) {
@@ -636,6 +845,14 @@ i#instructionX:hover {
         font-size: 24px;
     }
 
+    #leaderboardX {
+        font-size: 20px;
+    }
+
+    #leaderboardX:hover {
+        font-size: 24px;
+    }
+
     #textBox h1 {
         margin-top: 20%;
         font-size: 12px;
@@ -657,6 +874,49 @@ i#instructionX:hover {
     #new-high-score h1 {
         font-size: 18px;
     }
+
+    #login-portal {
+        width: 80px;
+        margin-left: -40px;
+    }
+
+    #login-portal h1 {
+        font-size: 18px;
+    }
+
+    #login-portal p {
+        font-size: 10px;
+    }
+
+    #login-portal a {
+        font-size: 10px;
+    }
+
+    #login-portal input[type="text"], input[type="password"] {
+        font-size: 10px;
+    }
+
+    #register-portal {
+        width: 80px;
+        margin-left: -40px;
+    }
+
+    #register-portal h1 {
+        font-size: 18px;
+    }
+
+    #register-portal p {
+        font-size: 10px;
+    }
+
+    #register-portal a {
+        font-size: 10px;
+    }
+
+    #register-portal input[type="text"], input[type="password"] {
+        font-size: 10px;
+    }
+
 }
 
 #left-border {

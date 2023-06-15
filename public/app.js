@@ -20,7 +20,8 @@ var platforms = [base];
 var colorPercent = 20;
 
 var moveRight = true;
-var paused = true;
+var paused = false;
+var drop = false;
 var firstBlock = true;
 var gameOver = false;
 var newHighScore = false;
@@ -30,9 +31,17 @@ var loadScreen = true;
 var username = "";
 var loggedIn = false;
 var viewedPortal = false;
+
+var loginButton = document.getElementById("register-portal").getElementsByTagName("a")[1];
+var loginButton2 = document.getElementById("login-button-container").getElementsByTagName("a")[0];
+
 var closeLoginPortalButton = document.getElementById("login-portal").getElementsByTagName("a")[0];
+var closeRegisterPortalButton = document.getElementById("register-portal").getElementsByTagName("a")[0];
+
 var forgotPassButton = document.getElementById("login-portal").getElementsByTagName("a")[1];
+
 var signUpButton = document.getElementById("login-portal").getElementsByTagName("a")[2];
+var signUpButton2 = document.getElementById("login-button-container").getElementsByTagName("a")[1];
 
 let lavaInterval = window.setInterval(function() {
     if(wave_up) {
@@ -86,6 +95,16 @@ leaderboard.addEventListener("click", openLeaderboard, false);
 
 closeLoginPortalButton.onclick = closeLoginPortal;
 
+closeRegisterPortalButton.onclick = closeRegisterPortal;
+
+signUpButton.onclick = openRegisterPortal;
+
+signUpButton2.onclick = openRegisterPortal;
+
+loginButton.onclick = openLoginPortal;
+
+loginButton2.onclick = openLoginPortal;
+
 window.onresize = () => {
     
     pause();
@@ -95,16 +114,20 @@ window.onresize = () => {
     setBorders(borderWidth);
     resizePlatforms(blockWidth, borderWidth);
     unpause(blockWidth, windowWidth, borderWidth);
-     
+    if(loadScreen) {
+        paused = true;
+    }
 }
 
 document.addEventListener("keypress", function(e) {
+
+    e.preventDefault();
     
-    if(paused) {
+    if(!drop || paused || gameOver) {
         return;
     }
     else {
-        e.preventDefault();
+        
     }
     if(e.keycode == 32 ||
         e.code == "Space" ||
@@ -720,7 +743,7 @@ function startGame() {
     }, 1000);
 
     resizePlatforms(blockWidth);
-    paused = false;
+    drop = true;
     loadScreen = false;
     
 }
@@ -732,6 +755,7 @@ function openInstructions() {
     let X = document.getElementById("instructionX");
 
     background.style.height = "50vh";
+    background.style.border = "yellow solid 5px";
     X.style.opacity = "100";
     X.style.cursor = "pointer";
     
@@ -757,6 +781,10 @@ function openInstructions() {
         textBox.getElementsByTagName('p')[1].style.opacity = "100";
     }, 220)
 
+    setTimeout(function() {
+        textBox.style.overflowY = "auto";
+    }, 300);
+
     X.addEventListener("click", closeInstructions);
     restartButton.removeEventListener("click", restartGame, false);
     instructions.removeEventListener("click", openInstructions, false);
@@ -778,6 +806,7 @@ function closeInstructions() {
     background.style.height = "0";
     X.style.opacity = "0";
     X.style.cursor = "auto";
+    textBox.style.overflowY = "hidden";
 
     setTimeout(function() {
         textBox.getElementsByTagName('h1')[0].style.opacity = "0";
@@ -794,6 +823,7 @@ function closeInstructions() {
         
         document.getElementById("score-container").getElementsByTagName('h1')[0].style.opacity = "100";
         document.getElementById("score-container").getElementsByTagName('h1')[1].style.opacity = "100";
+        background.style.border = "none";
     }, 200);
 
     X.removeEventListener("click", closeInstructions);
@@ -812,6 +842,7 @@ function openLeaderboard() {
     let X = document.getElementById("leaderboardX");
 
     background.style.height = "50vh";
+    background.style.border = "yellow solid 5px";
     topScores.style.border = "white solid 2px";
     X.style.opacity = "100";
     X.style.cursor = "pointer";
@@ -847,18 +878,7 @@ function openLeaderboard() {
     leaderboard.style.cursor = "auto";
 
     if(!loggedIn && !viewedPortal) {
-        let portal = document.getElementById("login-portal");
-
-        setTimeout(function() {
-            portal.style.left = "40%";            
-        }, 600);
-
-        setTimeout(function() {
-            portal.style.transition = ".3";
-            portal.style.left = "50%";            
-        }, 1100)
-
-        viewedPortal = true;
+        openLoginPortal();
     }
 
 }
@@ -877,6 +897,7 @@ function closeLeaderboard() {
             restartButton.style.opacity = "1";
             document.getElementById("score-container").getElementsByTagName('h1')[0].style.opacity = "1";
             document.getElementById("score-container").getElementsByTagName('h1')[1].style.opacity = "1";
+            
         }, 220);
     }
 
@@ -896,6 +917,7 @@ function closeLeaderboard() {
         X.style.cursor = "auto";
         leaderboard.style.opacity = "1";
         instructions.style.opacity = "1";
+        background.style.border = "none";
     }, 220);
 
     X.removeEventListener("click", closeLeaderboard);
@@ -949,14 +971,60 @@ function gameFinished() {
     
 }
 
+function openLoginPortal() {
+    let portal = document.getElementById("login-portal");
+    const registerPortal = document.getElementById("register-portal");
+    if(registerPortal.style.left === "50%") {
+        closeRegisterPortal();
+    }
+
+        setTimeout(function() {
+            portal.style.left = "40%";            
+        }, 300);
+
+        setTimeout(function() {
+            portal.style.transition = ".3";
+            portal.style.left = "50%";            
+        }, 700)
+
+        viewedPortal = true;
+}
+
 function closeLoginPortal() {
     const portal = document.getElementById("login-portal");
     portal.style.left = "40%";
     setTimeout(function() {
-        portal.style.transition = ".5s";
+        portal.style.transition = ".4s";
         portal.style.left = "150%";
     }, 300);
     
+}
+
+function openRegisterPortal() {
+    const portal = document.getElementById("register-portal");
+    const loginPortal = document.getElementById("login-portal");
+    if(loginPortal.style.left === "50%") {
+        closeLoginPortal();
+    }
+    
+    setTimeout(function() {
+        portal.style.left = "60%";            
+    }, 300);
+
+    setTimeout(function() {
+        portal.style.transition = ".3s";
+        portal.style.left = "50%";            
+    }, 700);
+}
+
+function closeRegisterPortal() {
+    
+    const portal = document.getElementById("register-portal");
+    portal.style.left = "60%";
+    setTimeout(function() {
+        portal.style.transition = ".4s";
+        portal.style.left = "-100%";
+    }, 300);
 }
 
 //EFFECTS: Verifies the user's login credentials and logs them in if they are correct

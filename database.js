@@ -94,10 +94,13 @@ export async function getBestScores(users) {
 
     
 */
-//const loginInfo = await getLoginInformation(pool);
+
 //const topScores = await getBestScores(loginInfo);
-//await createNewUser("test_name", "test_pass", pool);
-//console.log(topScores);
+/* await createNewUser("test_name", "test_pass", pool);
+const loginInfo = await getLoginInformation(pool);
+console.log(loginInfo);
+const user = await getUserInformation(46);
+console.log(user); */
 
 
 
