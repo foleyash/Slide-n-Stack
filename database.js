@@ -10,12 +10,15 @@ export const pool = mysql.createPool({
     database: process.env.MYSQL_DATABASE
 }).promise()
 
+//EFFECTS: Returns an array of login information for all users in the database (user_id, user_email, user_name, user_pass)
 export async function getLoginInformation(pool) {
     const [login_info] = await pool.query("SELECT * FROM login_user")
 
     return login_info
 }
 
+//REQURIES: user_id is a valid user_id in the database
+//EFFECTS: returns an object of the user's information that contains placement, high_level, and extra_platforms
 export async function getUserInformation(user_id) {
     const [user_info] = await pool.query(`
     SELECT * 
@@ -28,7 +31,7 @@ export async function getUserInformation(user_id) {
 
 //REQUIRES: user_name and user_pass <= 50 chars
 //MODIFIES: login_user and users tables
-//EFFECTS: adds a new user to the database with default values
+//EFFECTS: adds a new user to the database with default values, returns the user_id of the new user
 export async function createNewUser(user_email, user_name, user_pass, pool) {
     const [result] = await pool.query(`
     INSERT INTO login_user (user_email, user_name, user_pass)
@@ -46,6 +49,7 @@ export async function createNewUser(user_email, user_name, user_pass, pool) {
     VALUES (?, ?)
     `, [id, rows[0][0].numUsers])
 
+    return id;
 }
 
 //REQUIRES: users is a valid array of the loginInformation objects including user_id, user_name, and user_pass

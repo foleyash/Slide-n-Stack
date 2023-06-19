@@ -62,14 +62,14 @@ app.post('/api/register', async (req, res) => {
         const salt = await bcrypt.genSalt();
         const hashedPassword = await bcrypt.hash(req.body.password, salt);
         //registers a new user in the database with the given username and hashed password
-        await database.createNewUser(req.body.email, req.body.username, hashedPassword, database.pool);
-
+        const user_id = await database.createNewUser(req.body.email, req.body.username, hashedPassword, database.pool);
+        const user = await database.getUserInformation(user_id, database.pool);
         res.json({
             status: "success",
             username: req.body.username,
-            placement: await database.getUserInformation(req.body.username, database.pool).placement,
-            high_level: await database.getUserInformation(req.body.username, database.pool).high_level,
-            extra_platforms: await database.getUserInformation(req.body.username, database.pool).extra_platforms
+            placement: user.placement,
+            high_level: user.high_level,
+            extra_platforms: user.extra_platforms
         });
 
         //send 201 status to client to indicate that the user was created

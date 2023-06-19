@@ -32,8 +32,8 @@ var username = "";
 var loggedIn = false;
 var viewedPortal = false;
 
-var submitLogin = document.getElementById("submit-login");
-var submitRegister = document.getElementById("submit-register");
+var loginForm = document.getElementById("login-form");
+var registerForm = document.getElementById("sign-in-form");
 
 var loginButton = document.getElementById("register-portal").getElementsByTagName("a")[1];
 var loginButton2 = document.getElementById("login-button-container").getElementsByTagName("a")[0];
@@ -108,9 +108,9 @@ loginButton.onclick = openLoginPortal;
 
 loginButton2.onclick = openLoginPortal;
 
-submitLogin.onclick = attemptLogin;
+loginForm.onsubmit = attemptLogin;
 
-submitRegister.onclick = attemptRegister;
+registerForm.onsubmit = attemptRegister;
 
 window.onresize = () => {
     
@@ -1053,13 +1053,21 @@ async function attemptLogin() {
     //console.log(user_name + " " + user_pass);
 }
 
-async function attemptRegister() {
+async function attemptRegister(e) {
+    e.preventDefault();
+
     const user_email = document.getElementById("register-email").value;
     const user_name = document.getElementById("register-username").value;
     const user_pass = document.getElementById("register-pass").value;
     const user_pass_confirm = document.getElementById("register-confirm-pass").value;
 
     if(user_pass !== user_pass_confirm) {
+        document.getElementById("register-pass").value = "";
+        document.getElementById("register-confirm-pass").value = "";
+        document.getElementById("register-pass").placeholder.style.color = "red";
+        document.getElementById("register-confirm-pass").placeholder.style.color = "red";
+        document.getElementById("register-pass").style.borderBottom = "2px solid red";
+        document.getElementById("register-confirm-pass").style.borderBottom = "2px solid red";
         console.log("Passwords do not match");
         return;
     }
@@ -1071,7 +1079,15 @@ async function attemptRegister() {
         console.log("Password is too long");
     }
 
-    registerUser(user_email, user_name, user_pass);
+    const data = await registerUser(user_email, user_name, user_pass);
+
+   if(data.status === "success") {
+        console.log("User successfully registered");
+    }
+    else {
+        console.log("User registration failed");
+        console.error();
+    } 
 }
 
 //EFFECTS: Verifies the user's login credentials and logs them in if they are correct
@@ -1090,7 +1106,8 @@ async function authenticateUser(user_name, user_pass) {
 
     const response = await fetch('/api/authenticate', options);
     const data = await response.json();
-    console.log(data);
+    
+    return data;
 }
 
 //EFFECTS: Registers a new user to the database with a unique user_name
@@ -1113,7 +1130,8 @@ async function registerUser(user_email, user_name, user_pass) {
 
     const response = await fetch('/api/register', options);
     const data = await response.json();
-    console.log(data);
+    
+    return data;
 }
 
 //REQUIRES: User is logged in to their account
