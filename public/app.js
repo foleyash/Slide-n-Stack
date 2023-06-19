@@ -32,6 +32,9 @@ var username = "";
 var loggedIn = false;
 var viewedPortal = false;
 
+var submitLogin = document.getElementById("submit-login");
+var submitRegister = document.getElementById("submit-register");
+
 var loginButton = document.getElementById("register-portal").getElementsByTagName("a")[1];
 var loginButton2 = document.getElementById("login-button-container").getElementsByTagName("a")[0];
 
@@ -105,6 +108,10 @@ loginButton.onclick = openLoginPortal;
 
 loginButton2.onclick = openLoginPortal;
 
+submitLogin.onclick = attemptLogin;
+
+submitRegister.onclick = attemptRegister;
+
 window.onresize = () => {
     
     pause();
@@ -118,30 +125,6 @@ window.onresize = () => {
         paused = true;
     }
 }
-
-document.addEventListener("keypress", function(e) {
-
-    e.preventDefault();
-    
-    if(!drop || paused || gameOver) {
-        return;
-    }
-    else {
-        
-    }
-    if(e.keycode == 32 ||
-        e.code == "Space" ||
-        e.key == " "
-        ) {
-        
-        dropPlatform(firstBlock, blockWidth);
-        if(firstBlock) {
-            firstBlock = false;
-        }
-        
-    }
-    
-});
 
 //FUNCTION DEFINITIONS BELOW ****
 
@@ -225,6 +208,26 @@ function getBorderWidth() {
     return borderWidth;
 }
 
+function onSpaceBar(e) {
+
+    e.preventDefault();
+    
+  /*  if(!drop || paused || gameOver) {
+        return;
+    } */
+
+    if(e.keycode == 32 ||
+        e.code == "Space" ||
+        e.key == " "
+        ) {
+        
+        dropPlatform(firstBlock, blockWidth);
+        if(firstBlock) {
+            firstBlock = false;
+        }
+        
+    }
+}
 
 function setPlatform(blockWidth, borderWidth) {
 
@@ -745,6 +748,9 @@ function startGame() {
     resizePlatforms(blockWidth);
     drop = true;
     loadScreen = false;
+
+    //add the event listener for the space bar to drop platforms
+    document.addEventListener("keypress", onSpaceBar);
     
 }
 
@@ -881,6 +887,11 @@ function openLeaderboard() {
         openLoginPortal();
     }
 
+    //remove the event listener for key presses
+    if(!loadScreen) {
+        document.removeEventListener("keypress", onSpaceBar);
+    }
+
 }
 
 function closeLeaderboard() {
@@ -928,6 +939,12 @@ function closeLeaderboard() {
     restartButton.style.cursor = "pointer";
     instructions.style.cursor = "pointer";
     leaderboard.style.cursor = "pointer";
+
+    //re-add the event listener for key presses
+    if(!loadScreen) {
+        document.addEventListener("keypress", onSpaceBar);
+    }
+    
 }
 
 async function restartGame() {
@@ -1027,6 +1044,36 @@ function closeRegisterPortal() {
     }, 300);
 }
 
+async function attemptLogin() {
+    const user_name = document.getElementById("login-username").value;
+    const user_pass = document.getElementById("login-pass").value;
+
+    authenticateUser(user_name, user_pass);
+
+    //console.log(user_name + " " + user_pass);
+}
+
+async function attemptRegister() {
+    const user_email = document.getElementById("register-email").value;
+    const user_name = document.getElementById("register-username").value;
+    const user_pass = document.getElementById("register-pass").value;
+    const user_pass_confirm = document.getElementById("register-confirm-pass").value;
+
+    if(user_pass !== user_pass_confirm) {
+        console.log("Passwords do not match");
+        return;
+    }
+
+    if(user_name.length > 50) {
+        console.log("Username is too long");
+    }
+    else if(user_pass.length > 50) {
+        console.log("Password is too long");
+    }
+
+    registerUser(user_email, user_name, user_pass);
+}
+
 //EFFECTS: Verifies the user's login credentials and logs them in if they are correct
 async function authenticateUser(user_name, user_pass) {
     
@@ -1034,7 +1081,7 @@ async function authenticateUser(user_name, user_pass) {
 
     //JSON object to be passed into api
     const options = {
-        method: 'GET',
+        method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
@@ -1047,15 +1094,13 @@ async function authenticateUser(user_name, user_pass) {
 }
 
 //EFFECTS: Registers a new user to the database with a unique user_name
-async function registerUser(user_name, user_pass) {
-    if(user_name.length > 50) {
-        console.log("Username is too long");
-    }
-    else if(user_pass.length > 50) {
-        console.log("Password is too long");
-    }
+async function registerUser(user_email, user_name, user_pass) {
     
-    const user = {user_name, user_pass};
+    const user = {
+        email: user_email, 
+        username: user_name, 
+        password: user_pass
+    };
 
     //JSON object to be passed into api
     const options = {

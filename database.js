@@ -29,14 +29,15 @@ export async function getUserInformation(user_id) {
 //REQUIRES: user_name and user_pass <= 50 chars
 //MODIFIES: login_user and users tables
 //EFFECTS: adds a new user to the database with default values
-export async function createNewUser(user_name, user_pass, pool) {
+export async function createNewUser(user_email, user_name, user_pass, pool) {
     const [result] = await pool.query(`
-    INSERT INTO login_user (user_name, user_pass)
-    VALUES (?, ?)
-    `, [user_name, user_pass])
+    INSERT INTO login_user (user_email, user_name, user_pass)
+    VALUES (?, ?, ?)
+    `, [user_email, user_name, user_pass])
 
     const id = result.insertId
 
+    //get the number of users in the database
     const rows = await pool.query(`SELECT COUNT(*) as numUsers FROM login_user`)
 
     //insert user_id and place the user in the last place
@@ -58,7 +59,7 @@ export async function getBestScores(users) {
         const userInfo = await getUserInformation(id);
         const placement = await userInfo.placement;
         
-        if(placement <= 10) {
+        if(placement <= 25) {
             let user = {
                 user_name: users[i].user_name,
                 placement: placement,
@@ -96,7 +97,7 @@ export async function getBestScores(users) {
 */
 
 //const topScores = await getBestScores(loginInfo);
-/* await createNewUser("test_name", "test_pass", pool);
+/* await createNewUser("foleyash24@gmail.com", "foleyash", "password", pool);
 const loginInfo = await getLoginInformation(pool);
 console.log(loginInfo);
 const user = await getUserInformation(46);

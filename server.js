@@ -39,16 +39,18 @@ app.post('/api/updateScore', (req, res) => {
 //REQURIES: req.body contains a username and password
 //EFFECTS: returns a 200 status if the user is authenticated, 401 status if the user is not authenticated
 app.post('/api/authenticate', async (req, res) => {
-    const user = await database.getUser(req.body.username, database.pool);
+    const user = await database.getUserInformation(req.body.user_name, database.pool);
     if(user == null) {
         return res.status(401).send("Cannot find user");
     }
     try {
-        if(await bcrypt.compare(req.body.password, user.user_pass)) {
+        if(await bcrypt.compare(req.body.user_pass, user.user_pass)) {
             res.status(200).send();
+            console.log("User authenticated");
         }
         else {
             res.status(401).send();
+            console.log("Incorrect password");
         }
     } catch {
         res.status(500).send();
@@ -60,7 +62,15 @@ app.post('/api/register', async (req, res) => {
         const salt = await bcrypt.genSalt();
         const hashedPassword = await bcrypt.hash(req.body.password, salt);
         //registers a new user in the database with the given username and hashed password
-        database.createNewUser(req.body.username, hashedPassword, database.pool);
+        await database.createNewUser(req.body.email, req.body.username, hashedPassword, database.pool);
+
+        res.json({
+            status: "success",
+            username: req.body.username,
+            placement: await database.getUserInformation(req.body.username, database.pool).placement,
+            high_level: await database.getUserInformation(req.body.username, database.pool).high_level,
+            extra_platforms: await database.getUserInformation(req.body.username, database.pool).extra_platforms
+        });
 
         //send 201 status to client to indicate that the user was created
         res.status(201).send()
