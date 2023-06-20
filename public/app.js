@@ -1044,13 +1044,21 @@ function closeRegisterPortal() {
     }, 300);
 }
 
-async function attemptLogin() {
+async function attemptLogin(e) {
+    e.preventDefault();
+
     const user_name = document.getElementById("login-username").value;
     const user_pass = document.getElementById("login-pass").value;
 
-    authenticateUser(user_name, user_pass);
+    const data = await authenticateUser(user_name, user_pass);
 
-    //console.log(user_name + " " + user_pass);
+    if(data.status == "success") {
+        console.log("User logged in");
+        console.log(data);
+    }
+    else {
+        console.log("User not logged in");
+    }
 }
 
 async function attemptRegister(e) {
@@ -1083,6 +1091,7 @@ async function attemptRegister(e) {
 
    if(data.status === "success") {
         console.log("User successfully registered");
+        console.log(data);
     }
     else {
         console.log("User registration failed");
@@ -1090,10 +1099,14 @@ async function attemptRegister(e) {
     } 
 }
 
-//EFFECTS: Verifies the user's login credentials and logs them in if they are correct
+//EFFECTS: Verifies the user's login credentials and logs them in if they are correct, returns the user's data if successful
+//         as an object, otherwise returns an error message
 async function authenticateUser(user_name, user_pass) {
     
-    const user = {user_name, user_pass};
+    const user = {
+        username: user_name, 
+        password: user_pass
+    };
 
     //JSON object to be passed into api
     const options = {
@@ -1105,6 +1118,13 @@ async function authenticateUser(user_name, user_pass) {
     };
 
     const response = await fetch('/api/authenticate', options);
+    if(response.status === 401) {
+        return {status: "error", message: "Cannot find username"};
+    }
+    else if(response.status === 403) {
+        return {status: "error", message: "Incorrect password"};
+    }
+
     const data = await response.json();
     
     return data;

@@ -17,9 +17,21 @@ export async function getLoginInformation(pool) {
     return login_info
 }
 
-//REQURIES: user_id is a valid user_id in the database
+export async function getUserPass(user_name, pool) {
+    const [user] = await pool.query("SELECT user_pass FROM login_user where user_name = ?", [user_name]);
+
+    return user[0].user_pass;
+}
+
+export async function getUserId(user_name, pool) {
+    const [user_id] = await pool.query(`SELECT user_id FROM login_user WHERE user_name = ?`, [user_name]);
+
+    return user_id[0].user_id;
+}
+
+//REQURIES: user_id is a valid user_id in the database, pool is a valid pool object for the database
 //EFFECTS: returns an object of the user's information that contains placement, high_level, and extra_platforms
-export async function getUserInformation(user_id) {
+export async function getUserInformation(user_id, pool) {
     const [user_info] = await pool.query(`
     SELECT * 
     FROM users

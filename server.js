@@ -39,22 +39,34 @@ app.post('/api/updateScore', (req, res) => {
 //REQURIES: req.body contains a username and password
 //EFFECTS: returns a 200 status if the user is authenticated, 401 status if the user is not authenticated
 app.post('/api/authenticate', async (req, res) => {
-    const user = await database.getUserInformation(req.body.user_name, database.pool);
+    
+    const id = await database.getUserId(req.body.username, database.pool);
+    const user = await database.getUserInformation(id, database.pool);
+    const hashedPassword = await database.getUserPass(req.body.username, database.pool);
+    
     if(user == null) {
         return res.status(401).send("Cannot find user");
     }
-    try {
-        if(await bcrypt.compare(req.body.user_pass, user.user_pass)) {
-            res.status(200).send();
+    
+    bcrypt.compare(req.body.password, hashedPassword, function(err, result) {
+        if(result) {
+            
             console.log("User authenticated");
+            res.json({
+                status: "success",
+                placement: user.placement,
+                level: user.high_level,
+                extraBlocks: user.extra_platforms
+            });
+
+            res.status(200).send("User authenticated");
         }
         else {
-            res.status(401).send();
-            console.log("Incorrect password");
+
+            res.status(403).send("Incorrect password");
         }
-    } catch {
-        res.status(500).send();
-    }
+    });
+       
 });
 
 app.post('/api/register', async (req, res) => {
@@ -76,6 +88,9 @@ app.post('/api/register', async (req, res) => {
         res.status(201).send()
     } catch {
         res.status(500).send();
+        res.json({
+            status: "failure"
+        });
     }
 });
 
