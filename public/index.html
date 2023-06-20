@@ -53,7 +53,7 @@
             <i id="leaderboardX" class="fa-solid fa-xmark" style="color: #ffffff;"></i>
             <h1 id="leaderboard-title">Leaderboard</h1>
             <div id="top-scores">
-                <div id="leaderboard-stats-container">
+                <div class="leaderboard-stats-container">
                     <div id="rank">Rank</div>
                     <div id="gamertag">Gamertag</div>
                     <div id="score">Score</div>
@@ -80,9 +80,9 @@
             <div id="register-portal">
                 <h1>Sign Up Here</h1>
                 <form id="sign-in-form">
-                    <input type="email" name="email" placeholder="Enter Email" id="register-email" required></input>
-                    <input type="text" name="username" placeholder="Enter Username" id="register-username" required></input>
-                    <input type="password" name="password" placeholder="Enter Password" id="register-pass" required></input>
+                    <input type="email" name="email" placeholder="Enter Email" id="register-email" required maxlength="40"></input>
+                    <input type="text" name="username" placeholder="Enter Username" id="register-username" required maxlength="25"></input>
+                    <input type="password" name="password" placeholder="Enter Password" id="register-pass" required minlength="8" maxlength="25"></input>
                     <input type="password" name="confirm password" placeholder="Confirm Password" id="register-confirm-pass" required></input>
                     <p id="error-message"></p>
                     <input type="submit" name="" value="Sign Up">

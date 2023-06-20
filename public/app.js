@@ -70,6 +70,10 @@ let lavaInterval = window.setInterval(function() {
     }
 }, 50); 
 
+//populate the leaderboard with the top 25 scores upon loading the page
+getTopScores()
+        .then(console.log("top scores retrieved"));
+
 //retrieve the width of child block, window, and border
 
 var blockWidth = getChildWidth();
@@ -1081,7 +1085,6 @@ async function attemptRegister(e) {
         document.getElementById("error-message").style.color = 'red';
         document.getElementById("register-pass").style.borderBottom = "2px solid red";
         document.getElementById("register-confirm-pass").style.borderBottom = "2px solid red";
-        console.log("Passwords do not match");
 
         document.getElementById("register-pass").onclick = function() {
             document.getElementById("register-pass").style.borderBottom = "1px solid #fff";
@@ -1094,11 +1097,11 @@ async function attemptRegister(e) {
         return;
     }
 
-    if(user_name.length > 50) {
+    if(user_name.length > 25) {
         document.getElementById("error-message").textContent = "Username is too long";
         document.getElementById("error-message").style.color = 'red';
     }
-    else if(user_pass.length > 50) {
+    else if(user_pass.length > 25) {
         document.getElementById("error-message").textContent = "Password is too long";
         document.getElementById("error-message").style.color = 'red';
     }
@@ -1220,22 +1223,38 @@ async function postScore() {
     console.log(data);
 }
 
-//EFFECTS: Retrieves the top 10 scores from the database and populates the leaderboard with the data
+//EFFECTS: Retrieves the top 25 scores from the database and populates the leaderboard with the data
 async function getTopScores() {
-
-    const options = {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({})
-    }
-    //Retrieve the top 10 scores from the database and your own score
+    
+    //Retrieve the top 25 scores from the database and your own score
     const response = await fetch('/api/retrieveLeaderboards');
     const data = await response.json();
-    console.log(data.topScores);
+    
+    if(data.status === 200) {
+        //if the status is 200, then the request was successful
+        //populate the leaderboard with the data
+        const scores = data.topScores;
+        for(let i = 0; i < scores.length; i++) {
+            const container = document.createElement('div');
+            container.classList.add("leaderboard-stats-container");
+            const user = scores[i];
+            const rankDiv = document.createElement('div');
+            rankDiv.textContent = `${user.placement}`;
+            const gamertagDiv = document.createElement('div');
+            gamertagDiv.textContent = `${user.user_name}`;
+            const scoreDiv = document.createElement('div');
+            scoreDiv.textContent = `Level: ${user.high_level} | Extra Blocks: ${user.extra_blocks}`;
 
-    return scores;
+            container.appendChild(rankDiv);
+            container.appendChild(gamertagDiv);
+            container.appendChild(scoreDiv);
+            document.getElementById("top-scores").appendChild(container);
+        }
+    }
+    else if (data.status === 500) {
+        //if the status is 500, then there was an internal server error
+        console.error("Internal Server Error");
+    }
 }
 
 //EFFECTS: Stops the moveInterval which pauses the game

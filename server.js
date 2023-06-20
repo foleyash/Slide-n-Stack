@@ -10,15 +10,23 @@ app.use(express.json({limit: '1mb'}));
 
 //GET request which allows the client to retrieve the scores of the top 10 players as well as their own score
 app.get('/api/retrieveLeaderboards', async (req, res) => {
+
+    try {
     const users = await database.getLoginInformation(database.pool);
-    console.log(users);
-    console.log("Got users");
-    const topScores = await database.getBestScores(users);
+    const topScores = await database.getBestScores(users, database.pool);
 
     res.json({
-        status: "success",
+        status: 200,
         topScores: topScores
-    })
+    });
+
+    res.status(200).send();
+    } catch {
+        res.json({
+            status: 500
+        });
+        res.status(500).send();
+    }
 });
 
 //POST request which allows the client to store their score in the database

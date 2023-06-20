@@ -80,13 +80,13 @@ export async function createNewUser(user_email, user_name, user_pass, pool) {
 
 //REQUIRES: users is a valid array of the loginInformation objects including user_id, user_name, and user_pass
 //EFFFECTS: returns an array of objects of the top 10 or less users and their respective placements and scores
-export async function getBestScores(users) {
+export async function getBestScores(users, pool) {
     let topScores = [];
     for(let i = 0; i < users.length; i++) {
 
         const id = users[i].user_id;
      
-        const userInfo = await getUserInformation(id);
+        const userInfo = await getUserInformation(id, pool);
         const placement = await userInfo.placement;
         
         if(placement <= 25) {
@@ -127,11 +127,10 @@ export async function getBestScores(users) {
 */
 
 //const topScores = await getBestScores(loginInfo);
-/* await createNewUser("foleyash24@gmail.com", "foleyash", "password", pool);
+ /* await createNewUser("foleyash24@gmail.com", "foleyash", "password", pool);
 const loginInfo = await getLoginInformation(pool);
-console.log(loginInfo);
-const user = await getUserInformation(46);
-console.log(user); */
+const topScores = await getBestScores(loginInfo, pool);
+console.log(topScores); */
 
 
 
