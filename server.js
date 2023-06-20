@@ -70,6 +70,20 @@ app.post('/api/authenticate', async (req, res) => {
 });
 
 app.post('/api/register', async (req, res) => {
+
+    if(database.doesUserExist(req.body.username, database.pool)) {
+        res.json({
+            status: 409	
+        });
+        res.status(409).send();
+    }
+    else if(database.doesEmailExist(req.body.email, database.pool)) {
+        res.json({
+            status: 408
+        });
+        res.status(408).send();
+    }
+
     try {
         const salt = await bcrypt.genSalt();
         const hashedPassword = await bcrypt.hash(req.body.password, salt);
@@ -77,8 +91,7 @@ app.post('/api/register', async (req, res) => {
         const user_id = await database.createNewUser(req.body.email, req.body.username, hashedPassword, database.pool);
         const user = await database.getUserInformation(user_id, database.pool);
         res.json({
-            status: "success",
-            username: req.body.username,
+            status: 201,
             placement: user.placement,
             high_level: user.high_level,
             extra_platforms: user.extra_platforms
@@ -87,10 +100,10 @@ app.post('/api/register', async (req, res) => {
         //send 201 status to client to indicate that the user was created
         res.status(201).send()
     } catch {
-        res.status(500).send();
         res.json({
-            status: "failure"
+            status: 500
         });
+        res.status(500).send();
     }
 });
 

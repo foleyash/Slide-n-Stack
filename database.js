@@ -17,6 +17,20 @@ export async function getLoginInformation(pool) {
     return login_info
 }
 
+//EFFECTS: Returns a boolean value if the username is already registered with the database
+export async function doesUserExist(user_name, pool) {
+    const [user] = await pool.query("SELECT * FROM login_user WHERE user_name = ?", [user_name]);
+
+    return user.length > 0;
+}
+
+//EFFECTS: Returns a boolean value if the email is already registered with the database
+export async function doesEmailExist(user_email, pool) {
+    const [email] = await pool.query("SELECT * FROM login_user WHERE user_email = ?", [user_email]);
+    
+    return email.length > 0;
+}
+
 export async function getUserPass(user_name, pool) {
     const [user] = await pool.query("SELECT user_pass FROM login_user where user_name = ?", [user_name]);
 

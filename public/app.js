@@ -9,6 +9,9 @@ var currScore = document.getElementById("curr-score");
 var highScore = document.getElementsByClassName("high-score")[0];
 var restartButton = document.getElementById("restart-button");
 
+//hide overflow in the window
+document.body.style.overflow = "hidden";
+
 base.style.left = (getWindowWidth() / 2 - 2 * getChildWidth()) + "px";
 let wave_up = true;
 let wave_size = 0;
@@ -185,7 +188,7 @@ function setBorders(borderWidth) {
     if(borderWidth <= 6) {
         leftBorder.style.border = "none";
         rightBorder.style.border = "none"
-        leftBorder.style.background = "white";
+       leftBorder.style.background = "white";
         rightBorder.style.background = "white";
     } 
     else {
@@ -1069,33 +1072,72 @@ async function attemptRegister(e) {
     const user_pass = document.getElementById("register-pass").value;
     const user_pass_confirm = document.getElementById("register-confirm-pass").value;
 
+    //check if the passwords match one another
+    //if they do not, clear the password fields and display an error message
     if(user_pass !== user_pass_confirm) {
         document.getElementById("register-pass").value = "";
         document.getElementById("register-confirm-pass").value = "";
-        document.getElementById("register-pass").placeholder.style.color = "red";
-        document.getElementById("register-confirm-pass").placeholder.style.color = "red";
+        document.getElementById("error-message").textContent = "Passwords do not match";
+        document.getElementById("error-message").style.color = 'red';
         document.getElementById("register-pass").style.borderBottom = "2px solid red";
         document.getElementById("register-confirm-pass").style.borderBottom = "2px solid red";
         console.log("Passwords do not match");
+
+        document.getElementById("register-pass").onclick = function() {
+            document.getElementById("register-pass").style.borderBottom = "1px solid #fff";
+            document.getElementById("error-message").textContent = "";
+        }
+        document.getElementById("register-confirm-pass").onclick = function() {
+            document.getElementById("register-confirm-pass").style.borderBottom = "1px solid #fff";
+            document.getElementById("error-message").textContent = "";
+        }
         return;
     }
 
     if(user_name.length > 50) {
-        console.log("Username is too long");
+        document.getElementById("error-message").textContent = "Username is too long";
+        document.getElementById("error-message").style.color = 'red';
     }
     else if(user_pass.length > 50) {
-        console.log("Password is too long");
+        document.getElementById("error-message").textContent = "Password is too long";
+        document.getElementById("error-message").style.color = 'red';
     }
 
     const data = await registerUser(user_email, user_name, user_pass);
 
-   if(data.status === "success") {
+    if(data.status === 409) {
+        //if status of 409, then the username is already taken
+        document.getElementById("error-message").textContent = "User already exists";
+        document.getElementById("error-message").style.color = 'red';
+        document.getElementById("register-username").style.borderBottom = "2px solid red";
+        document.getElementById("register-username").value = "";
+        
+        document.getElementById("register-username").onclick = function() {
+            document.getElementById("error-message").textContent = "";
+            document.getElementById("register-username").style.borderBottom = "1px solid #fff";
+        }
+    } 
+    else if (data.status === 408) {
+        //is status of 408, then the email is already registered
+        document.getElementById("error-message").textContent = "Email is already registered";
+        document.getElementById("error-message").style.color = 'red';
+        document.getElementById("register-email").style.borderBottom = "2px solid red";
+        document.getElementById("register-email").value = "";
+
+        document.getElementById("register-email").onclick = function() {
+            document.getElementById("error-message").textContent = "";
+            document.getElementById("register-email").style.borderBottom = "1px solid #fff";
+        }
+    } 
+    else if(data.status === 201) {
+    // add the user's information to the web browser and send a cookie so that their information may be stored
         console.log("User successfully registered");
-        console.log(data);
-    }
-    else {
-        console.log("User registration failed");
-        console.error();
+        username = user_name;
+        loggedIn = true;
+        closeRegisterPortal();
+    } 
+    else { // status == 500 (Internal Server Error)
+        console.error("Internal Server Error");
     } 
 }
 
@@ -1149,6 +1191,9 @@ async function registerUser(user_email, user_name, user_pass) {
     };
 
     const response = await fetch('/api/register', options);
+    if(response.status === 409) {
+        return response;
+    }
     const data = await response.json();
     
     return data;
