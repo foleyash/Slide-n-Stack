@@ -127,8 +127,8 @@ export async function getBestScores(users, pool) {
 */
 
 //const topScores = await getBestScores(loginInfo);
- /* await createNewUser("foleyash24@gmail.com", "foleyash", "password", pool);
-const loginInfo = await getLoginInformation(pool);
+ 
+ /*const loginInfo = await getLoginInformation(pool);
 const topScores = await getBestScores(loginInfo, pool);
 console.log(topScores); */
 

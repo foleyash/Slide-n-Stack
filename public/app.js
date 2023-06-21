@@ -24,11 +24,12 @@ var colorPercent = 20;
 
 var moveRight = true;
 var paused = false;
-var drop = false;
 var firstBlock = true;
 var gameOver = false;
 var newHighScore = false;
 var loadScreen = true;
+
+setLeaderboardText();
 
 //user authentication local variables
 var username = "";
@@ -72,7 +73,7 @@ let lavaInterval = window.setInterval(function() {
 
 //populate the leaderboard with the top 25 scores upon loading the page
 getTopScores()
-        .then(console.log("top scores retrieved"));
+        .then((data) => {});
 
 //retrieve the width of child block, window, and border
 
@@ -121,16 +122,24 @@ registerForm.onsubmit = attemptRegister;
 
 window.onresize = () => {
     
-    pause();
-    blockWidth = getChildWidth();
-    windowWidth = getWindowWidth();
-    borderWidth = getBorderWidth();
-    setBorders(borderWidth);
-    resizePlatforms(blockWidth, borderWidth);
-    unpause(blockWidth, windowWidth, borderWidth);
-    if(loadScreen) {
-        paused = true;
+    if(paused) {
+        blockWidth = getChildWidth();
+        windowWidth = getWindowWidth();
+        borderWidth = getBorderWidth();
+        setBorders(borderWidth);
+        resizePlatforms(blockWidth, borderWidth);
+    } else {
+        pause();
+        blockWidth = getChildWidth();
+        windowWidth = getWindowWidth();
+        borderWidth = getBorderWidth();
+        setBorders(borderWidth);
+        resizePlatforms(blockWidth, borderWidth);
+        unpause(blockWidth, windowWidth, borderWidth);
     }
+
+    setLeaderboardText();
+    
 }
 
 //FUNCTION DEFINITIONS BELOW ****
@@ -753,7 +762,6 @@ function startGame() {
     }, 1000);
 
     resizePlatforms(blockWidth);
-    drop = true;
     loadScreen = false;
 
     //add the event listener for the space bar to drop platforms
@@ -954,6 +962,29 @@ function closeLeaderboard() {
     
 }
 
+function setLeaderboardText() {
+    if(getWindowWidth() < 600) {
+        let loginBox = document.getElementById("login-button-container");
+        loginBox.children[0].remove();
+        let text = document.createElement('p');
+        text.innerHTML = `<a id="login-button">Login</a> or <a id="sign-up-button">Sign Up</a> here!`
+        loginBox.appendChild(text);
+    }
+    else {
+        let loginBox = document.getElementById("login-button-container");
+        loginBox.children[0].remove();
+        let text = document.createElement('p');
+        text.innerHTML = `Want to add your score to the leaderboards? <a id="login-button" href="#">Login</a> or <a id="sign-up-button" href="#">Sign Up</a> here!`
+        loginBox.appendChild(text);
+    }
+
+    loginButton2 = document.getElementById("login-button");
+    signUpButton2 = document.getElementById("sign-up-button");
+
+    loginButton2.onclick = openLoginPortal;
+    signUpButton2.onclick = openRegisterPortal;
+}
+
 async function restartGame() {
     pause();
     currScore.textContent = 1;
@@ -1019,7 +1050,7 @@ function closeLoginPortal() {
     portal.style.left = "40%";
     setTimeout(function() {
         portal.style.transition = ".4s";
-        portal.style.left = "150%";
+        portal.style.left = "180%";
     }, 300);
     
 }
@@ -1242,18 +1273,22 @@ async function getTopScores() {
             rankDiv.textContent = `${user.placement}`;
             const gamertagDiv = document.createElement('div');
             gamertagDiv.textContent = `${user.user_name}`;
-            const scoreDiv = document.createElement('div');
-            scoreDiv.textContent = `Level: ${user.high_level} | Extra Blocks: ${user.extra_blocks}`;
+            const levelDiv = document.createElement('div');
+            levelDiv.textContent = `${user.high_level}`;
+            const extraBlocksDiv = document.createElement('div');
+            extraBlocksDiv.textContent = `${user.extra_platforms}`;
 
             container.appendChild(rankDiv);
             container.appendChild(gamertagDiv);
-            container.appendChild(scoreDiv);
+            container.appendChild(levelDiv);
+            container.appendChild(extraBlocksDiv);
             document.getElementById("top-scores").appendChild(container);
         }
     }
     else if (data.status === 500) {
         //if the status is 500, then there was an internal server error
         console.error("Internal Server Error");
+
     }
 }
 
