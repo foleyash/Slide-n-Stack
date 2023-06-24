@@ -8,24 +8,24 @@ const app = express()
 app.use(express.static('public'));
 app.use(express.json({limit: '1mb'}));
 
-//GET request which allows the client to retrieve the scores of the top 10 players as well as their own score
+//GET request which allows the client to retrieve the scores of the top 25 players
 app.get('/api/retrieveLeaderboards', async (req, res) => {
 
     try {
     const users = await database.getLoginInformation(database.pool);
     const topScores = await database.getBestScores(users, database.pool);
 
-    res.json({
+    return res.json({
         status: 200,
         topScores: topScores
-    });
+    }).status(200);
 
-    res.status(200).send();
-    } catch {
-        res.json({
+   } catch (err) {
+        console.error(err);
+        return res.json({
             status: 500
-        });
-        res.status(500).send();
+        }).status(500).send();
+
     }
 });
 
@@ -41,7 +41,9 @@ app.post('/api/updateScore', (req, res) => {
         status: "success",
         level: req.body.level,
         extraBlocks: req.body.extraBlocks
-    });
+    }).send();
+
+    return;
 });
 
 //REQURIES: req.body contains a username and password
@@ -49,47 +51,56 @@ app.post('/api/updateScore', (req, res) => {
 app.post('/api/authenticate', async (req, res) => {
     
     const id = await database.getUserId(req.body.username, database.pool);
+    if(id === null) {
+        //send 401 status to client to indicate that the user was not found
+        return res.json({
+            status: 401
+        }).status(401);
+    }
+
+    const user_name = await database.getUserName(id, database.pool);
     const user = await database.getUserInformation(id, database.pool);
     const hashedPassword = await database.getUserPass(req.body.username, database.pool);
-    
-    if(user == null) {
-        return res.status(401).send("Cannot find user");
-    }
     
     bcrypt.compare(req.body.password, hashedPassword, function(err, result) {
         if(result) {
             
-            console.log("User authenticated");
-            res.json({
-                status: "success",
+            //send 200 status to client to indicate that the user was authenticated
+            return res.json({
+                status: 200,
+                username: user_name,
                 placement: user.placement,
                 level: user.high_level,
                 extraBlocks: user.extra_platforms
-            });
-
-            res.status(200).send("User authenticated");
+            }).status(200);
+            
         }
         else {
 
-            res.status(403).send("Incorrect password");
+            //send 403 status to client to indicate that the password was incorrect
+            return res.json({
+                status: 403
+            }).status(403);
+    
         }
+        
     });
        
 });
 
 app.post('/api/register', async (req, res) => {
 
-    if(database.doesUserExist(req.body.username, database.pool)) {
-        res.json({
+    if(await database.doesUserExist(req.body.username, database.pool)) {
+        return res.json({
             status: 409	
-        });
-        res.status(409).send();
+        }).status(409).send();
+
     }
-    else if(database.doesEmailExist(req.body.email, database.pool)) {
-        res.json({
+    else if(await database.doesEmailExist(req.body.email, database.pool)) {
+        return res.json({
             status: 408
-        });
-        res.status(408).send();
+        }).status(408).send();
+
     }
 
     try {
@@ -98,20 +109,22 @@ app.post('/api/register', async (req, res) => {
         //registers a new user in the database with the given username and hashed password
         const user_id = await database.createNewUser(req.body.email, req.body.username, hashedPassword, database.pool);
         const user = await database.getUserInformation(user_id, database.pool);
-        res.json({
-            status: 201,
-            placement: user.placement,
-            high_level: user.high_level,
-            extra_platforms: user.extra_platforms
-        });
 
         //send 201 status to client to indicate that the user was created
-        res.status(201).send()
+        //send json information about the user to the client
+        return res.json({
+            status: 201,
+            username: req.body.username,
+            placement: user.placement,
+            level: user.high_level,
+            extraBlocks: user.extra_platforms
+        }).status(201).send();
+        
     } catch {
-        res.json({
+        //send error status to the client
+        return res.json({
             status: 500
-        });
-        res.status(500).send();
+        }).status(500).send();
     }
 });
 

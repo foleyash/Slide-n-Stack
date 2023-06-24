@@ -72,8 +72,7 @@ let lavaInterval = window.setInterval(function() {
 }, 50); 
 
 //populate the leaderboard with the top 25 scores upon loading the page
-getTopScores()
-        .then((data) => {});
+getTopScores();
 
 //retrieve the width of child block, window, and border
 
@@ -1082,6 +1081,32 @@ function closeRegisterPortal() {
     }, 300);
 }
 
+function populateUserData(user) {
+        let loginBox = document.getElementById("login-button-container");
+        loginBox.children[0].remove();
+        let wrapper = document.createElement('div');
+        wrapper.classList.add("leaderboard-stats-container");
+        const rankDiv = document.createElement('div');
+        rankDiv.textContent = `${user.placement}`;
+        const gamertagDiv = document.createElement('div');
+        gamertagDiv.textContent = `${user.username}`;
+        const levelDiv = document.createElement('div');
+        levelDiv.textContent = `${user.level}`;
+        const extraBlocksDiv = document.createElement('div');
+        extraBlocksDiv.textContent = `${user.extraBlocks}`;
+
+        wrapper.appendChild(rankDiv);
+        wrapper.appendChild(gamertagDiv);
+        wrapper.appendChild(levelDiv);
+        wrapper.appendChild(extraBlocksDiv);
+
+        loginBox.appendChild(wrapper);
+
+        //update highscore
+        highScore.textContent = user.level;
+
+}
+
 async function attemptLogin(e) {
     e.preventDefault();
 
@@ -1090,12 +1115,35 @@ async function attemptLogin(e) {
 
     const data = await authenticateUser(user_name, user_pass);
 
-    if(data.status == "success") {
-        console.log("User logged in");
-        console.log(data);
+    if(data.status === 200) {
+        username = data.username;
+        loggedIn = true;
+        populateUserData(data);
+        closeLoginPortal();
     }
-    else {
-        console.log("User not logged in");
+    else if (data.status === 401) {
+        //username/email not found, prompt user to try again
+        document.getElementById("error-message-login").textContent = "Username/Email cannot be found";
+        document.getElementById("error-message-login").style.color = 'red';
+        document.getElementById("login-username").style.borderBottom = "2px solid red";
+
+        document.getElementById("login-username").onclick = function() {
+            document.getElementById("login-username").style.borderBottom = "1px solid #fff";
+            document.getElementById("login-username").value = "";
+            document.getElementById("error-message-login").textContent = "";
+        }
+    }
+    else if (data.status === 403) {
+        //password is incorrect, prompt user to try again
+        document.getElementById("error-message-login").textContent = "Password is incorrect";
+        document.getElementById("error-message-login").style.color = 'red';
+        document.getElementById("login-pass").style.borderBottom = "2px solid red";
+
+        document.getElementById("login-pass").onclick = function() {
+            document.getElementById("login-pass").style.borderBottom = "1px solid #fff";
+            document.getElementById("login-pass").value = "";
+            document.getElementById("error-message-login").textContent = "";
+        }
     }
 }
 
@@ -1112,54 +1160,54 @@ async function attemptRegister(e) {
     if(user_pass !== user_pass_confirm) {
         document.getElementById("register-pass").value = "";
         document.getElementById("register-confirm-pass").value = "";
-        document.getElementById("error-message").textContent = "Passwords do not match";
-        document.getElementById("error-message").style.color = 'red';
+        document.getElementById("error-message-register").textContent = "Passwords do not match";
+        document.getElementById("error-message-register").style.color = 'red';
         document.getElementById("register-pass").style.borderBottom = "2px solid red";
         document.getElementById("register-confirm-pass").style.borderBottom = "2px solid red";
 
         document.getElementById("register-pass").onclick = function() {
             document.getElementById("register-pass").style.borderBottom = "1px solid #fff";
-            document.getElementById("error-message").textContent = "";
+            document.getElementById("error-message-register").textContent = "";
         }
         document.getElementById("register-confirm-pass").onclick = function() {
             document.getElementById("register-confirm-pass").style.borderBottom = "1px solid #fff";
-            document.getElementById("error-message").textContent = "";
+            document.getElementById("error-message-register").textContent = "";
         }
         return;
     }
 
     if(user_name.length > 25) {
-        document.getElementById("error-message").textContent = "Username is too long";
-        document.getElementById("error-message").style.color = 'red';
+        document.getElementById("error-message-register").textContent = "Username is too long";
+        document.getElementById("error-message-register").style.color = 'red';
     }
     else if(user_pass.length > 25) {
-        document.getElementById("error-message").textContent = "Password is too long";
-        document.getElementById("error-message").style.color = 'red';
+        document.getElementById("error-message-register").textContent = "Password is too long";
+        document.getElementById("error-message-register").style.color = 'red';
     }
 
     const data = await registerUser(user_email, user_name, user_pass);
 
     if(data.status === 409) {
         //if status of 409, then the username is already taken
-        document.getElementById("error-message").textContent = "User already exists";
-        document.getElementById("error-message").style.color = 'red';
+        document.getElementById("error-message-register").textContent = "User already exists";
+        document.getElementById("error-message-register").style.color = 'red';
         document.getElementById("register-username").style.borderBottom = "2px solid red";
         document.getElementById("register-username").value = "";
         
         document.getElementById("register-username").onclick = function() {
-            document.getElementById("error-message").textContent = "";
+            document.getElementById("error-message-register").textContent = "";
             document.getElementById("register-username").style.borderBottom = "1px solid #fff";
         }
     } 
     else if (data.status === 408) {
         //is status of 408, then the email is already registered
-        document.getElementById("error-message").textContent = "Email is already registered";
-        document.getElementById("error-message").style.color = 'red';
+        document.getElementById("error-message-register").textContent = "Email is already registered";
+        document.getElementById("error-message-register").style.color = 'red';
         document.getElementById("register-email").style.borderBottom = "2px solid red";
         document.getElementById("register-email").value = "";
 
         document.getElementById("register-email").onclick = function() {
-            document.getElementById("error-message").textContent = "";
+            document.getElementById("error-message-register").textContent = "";
             document.getElementById("register-email").style.borderBottom = "1px solid #fff";
         }
     } 
@@ -1169,6 +1217,7 @@ async function attemptRegister(e) {
         username = user_name;
         loggedIn = true;
         closeRegisterPortal();
+        populateUserData(data);
     } 
     else { // status == 500 (Internal Server Error)
         console.error("Internal Server Error");
@@ -1194,15 +1243,8 @@ async function authenticateUser(user_name, user_pass) {
     };
 
     const response = await fetch('/api/authenticate', options);
-    if(response.status === 401) {
-        return {status: "error", message: "Cannot find username"};
-    }
-    else if(response.status === 403) {
-        return {status: "error", message: "Incorrect password"};
-    }
-
     const data = await response.json();
-    
+
     return data;
 }
 

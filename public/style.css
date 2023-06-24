@@ -303,10 +303,11 @@
 
 .leaderboard-stats-container {
     width: 100%;
-    height: 16.66%;
+    height: fit-content;
     display:flex;
     align-items: center;
     justify-content: center;  
+    margin-top: 5px;
 }
 
 .leaderboard-stats-container div {
@@ -663,6 +664,11 @@
         font-size: 12px;
     }
 
+    .leaderboard-stats-container {
+        width: 150%;
+        overflow-x: auto;
+    }
+
     #leaderboardX {
         font-size: 30px;
     }
@@ -806,11 +812,6 @@
 
     .leaderboard-stats-container div {
         font-size: 10px;
-    }
-
-    .leaderboard-stats-container {
-        width: 150%;
-        overflow-x: auto;
     }
 
     #login-portal {

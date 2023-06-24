@@ -14,7 +14,7 @@ export const pool = mysql.createPool({
 export async function getLoginInformation(pool) {
     const [login_info] = await pool.query("SELECT * FROM login_user")
 
-    return login_info
+    return login_info;
 }
 
 //EFFECTS: Returns a boolean value if the username is already registered with the database
@@ -31,16 +31,28 @@ export async function doesEmailExist(user_email, pool) {
     return email.length > 0;
 }
 
+//REQURIES: user_name is a valid user_name in the database, pool is a valid pool object for the database
+//EFFECTS: returns the user_pass of the user with the given user_name
 export async function getUserPass(user_name, pool) {
     const [user] = await pool.query("SELECT user_pass FROM login_user where user_name = ?", [user_name]);
 
     return user[0].user_pass;
 }
 
+//REQUIRES: user_name is a valid user_name in the database, pool is a valid pool object for the database
+//EFFECTS: returns the user_id of the user with the given user_name
 export async function getUserId(user_name, pool) {
     const [user_id] = await pool.query(`SELECT user_id FROM login_user WHERE user_name = ?`, [user_name]);
+    if(user_id.length === 0) return null;
+    else return user_id[0].user_id;
+}
 
-    return user_id[0].user_id;
+//REQUIRES: user_id is a valid user_id in the database, pool is a valid pool object for the database
+//EFFECTS: returns the user_name of the user with the given user_id
+export async function getUserName(user_id, pool) {
+    const [user_name] = await pool.query(`SELECT user_name FROM login_user WHERE user_id = ?`, [user_id]);
+
+    return user_name[0].user_name;
 }
 
 //REQURIES: user_id is a valid user_id in the database, pool is a valid pool object for the database
@@ -50,9 +62,9 @@ export async function getUserInformation(user_id, pool) {
     SELECT * 
     FROM users
     WHERE user_id = ?
-    `, [user_id])
+    `, [user_id]);
 
-    return user_info[0]
+    return user_info[0];
 }
 
 //REQUIRES: user_name and user_pass <= 50 chars
@@ -87,14 +99,14 @@ export async function getBestScores(users, pool) {
         const id = users[i].user_id;
      
         const userInfo = await getUserInformation(id, pool);
-        const placement = await userInfo.placement;
+        const placement = userInfo.placement;
         
         if(placement <= 25) {
             let user = {
                 user_name: users[i].user_name,
                 placement: placement,
-                high_level: await userInfo.high_level,
-                extra_platforms: await userInfo.extra_platforms
+                high_level: userInfo.high_level,
+                extra_platforms: userInfo.extra_platforms
             };
             
             if(topScores.length === 0) topScores.push(user);
@@ -130,7 +142,7 @@ export async function getBestScores(users, pool) {
  
  /*const loginInfo = await getLoginInformation(pool);
 const topScores = await getBestScores(loginInfo, pool);
-console.log(topScores); */
-
-
+console.log(topScores); test("123", pool).then((user) => console.log(user));
+if(await doesUserExist("123", pool)) console.log("user exists");
+else console.log("user does not exist"); */
 
