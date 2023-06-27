@@ -6,7 +6,7 @@ import bcrypt from 'bcrypt';
 const app = express()
 
 app.use(express.static('public'));
-app.use(express.json({limit: '1mb'}));
+app.use(express.json({limit: '10mb'}));
 
 //GET request which allows the client to retrieve the scores of the top 25 players
 app.get('/api/retrieveLeaderboards', async (req, res) => {
@@ -29,21 +29,32 @@ app.get('/api/retrieveLeaderboards', async (req, res) => {
     }
 });
 
-//POST request which allows the client to store their score in the database
-app.post('/api/updateScore', (req, res) => {
+//REQUIRES: req.body contains a valid username and contains a higher score than that user's previous high score
+app.post('/api/updateScore', async (req, res) => {
 
     //Add the level and extra blocks to database if it is higher than the user's current high score
-    //TODO: use updateHighScore() function from database.js
-    console.log(req.body);
+    const id = await database.getUserId(req.body.username, database.pool);
 
-    //Return a resonse to the client with the level and extra blocks
-    res.json({
-        status: "success",
-        level: req.body.level,
-        extraBlocks: req.body.extraBlocks
-    }).send();
+    try {
+        const users = await database.getLoginInformation(database.pool);
+        const placement = await database.updateUserScore(id, users, req.body.level, req.body.extraBlocks, database.pool);
 
-    return;
+        //Return a resonse to the client with the level and extra blocks
+        return res.json({
+            status: 201,
+            username: req.body.username,
+            placement: placement,
+            level: req.body.level,
+            extraBlocks: req.body.extraBlocks
+        }).status(201).send();
+    }
+    catch (err) {
+        //Return a 500 status to the client if there is an error with the server
+        return res.json({
+            status: 500,
+            error: err
+        }).status(500).send();
+    }
 });
 
 //REQURIES: req.body contains a username and password

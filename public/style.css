@@ -321,6 +321,7 @@
     color: yellow;
     padding-top: 5px;
     padding-bottom: 5px;
+    overflow: hidden;
 }
 
 .leaderboard-stats-container div:nth-child(1) {

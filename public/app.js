@@ -5,8 +5,6 @@ var titleText = document.getElementById("slide-n-stack");
 var navBar = document.getElementById("nav-bar");
 var instructions = document.getElementById("instructions-start");
 var leaderboard = document.getElementById("leaderboard-start");
-var currScore = document.getElementById("curr-score");
-var highScore = document.getElementsByClassName("high-score")[0];
 var restartButton = document.getElementById("restart-button");
 
 //hide overflow in the window
@@ -18,6 +16,7 @@ let wave_size = 0;
 var blocksLeft = 3;
 var height = 1;
 var level = 1;
+var extraPlatforms = 0;
 var gameSpeed = 150;
 var platforms = [base];
 var colorPercent = 20;
@@ -34,6 +33,8 @@ setLeaderboardText();
 //user authentication local variables
 var username = "";
 var loggedIn = false;
+var highLevel = 1;
+var highPlatforms = 0;
 var viewedPortal = false;
 
 var loginForm = document.getElementById("login-form");
@@ -226,10 +227,6 @@ function getBorderWidth() {
 function onSpaceBar(e) {
 
     e.preventDefault();
-    
-  /*  if(!drop || paused || gameOver) {
-        return;
-    } */
 
     if(e.keycode == 32 ||
         e.code == "Space" ||
@@ -304,7 +301,7 @@ function movePlatform(blockWidth, windowWidth, borderWidth) {
   
 }
 
-function dropPlatform(firstBlock, blockWidth) {
+async function dropPlatform(firstBlock, blockWidth) {
 
     let last = false;
     let pos = px2num(platforms[platforms.length - 1].style.left); 
@@ -322,6 +319,8 @@ function dropPlatform(firstBlock, blockWidth) {
         else {
             setPlatform(blockWidth, borderWidth);
         }
+
+        updateScore();
         
     }
     else if (pos >= topPos + topWidth ||
@@ -345,7 +344,6 @@ function dropPlatform(firstBlock, blockWidth) {
         last = true;
         fallInterval(fallingBlocks, blockWidth, last);
        
-
     }
     else if(pos < topPos) {
         //placed partially on the front end of top
@@ -392,6 +390,8 @@ function dropPlatform(firstBlock, blockWidth) {
         platforms[platforms.length - 1] = div;
         floor.appendChild(div);
         fallInterval(fallingBlocks, blockWidth, last);
+
+        updateScore();
     }
     else if (pos > topPos) {
         //placed partially on the tail end of top
@@ -436,12 +436,14 @@ function dropPlatform(firstBlock, blockWidth) {
         platforms[platforms.length - 1] = div;
         floor.appendChild(div);
         fallInterval(fallingBlocks, blockWidth, last);
+
+        updateScore();
     }
    
     
 }
 
-function fallInterval(fallingBlocks, blockWidth, last) {
+async function fallInterval(fallingBlocks, blockWidth, last) {
 
     let count = 0;
     pause();
@@ -522,10 +524,22 @@ function fallInterval(fallingBlocks, blockWidth, last) {
             
             }
             else {
+                //remove the keypress listener for spacebar
+                document.removeEventListener("keypress", onSpaceBar);
                 //gameOver function here
                 
                 //post the scores of the user to server.js
-                postScore();
+                if(loggedIn) {
+                    const platforms = height - 2;
+
+                    //if the player received a higher score than the previous high score, post the new score
+                    //and update placements
+                    if(highLevel < level || (highLevel == level && extraPlatforms < platforms)) {
+                    postScore()
+                        .then((response) => {populateUserData(response)})
+                        .then(() => {getTopScores()});
+                    }
+                }
                 
             } 
             clearInterval(interval);
@@ -577,32 +591,69 @@ function blockBreak(left, top, width) {
 
 }
 
-function levelUp() {
-    level++;
-    currScore.textContent = level;
-    currScore.style.color = "white";
-    currScore.style.fontStyle = "bold";
-    if(Number(highScore.textContent) < Number(currScore.textContent)) {
-        highScore.textContent = currScore.textContent;
-        highScore.style.fontStyle = "bold";
-        highScore.style.color = "white";
-        if(!newHighScore) {
-            let h1 = document.getElementById('new-high-score').getElementsByTagName('h1')[0];
-            h1.style.opacity = "1";
-            newHighScore = true;
-
-            setTimeout(() => {
-                h1.style.opacity = "0";
-            }, 1000);
-
-        }
+function updateScore() {
+    extraPlatforms++;
+    let levelDiv = document.getElementById('curr-level');
+    levelDiv.textContent = level;
+    let platformsDiv = document.getElementById('curr-platforms');
+    if(extraPlatforms == 7) {
+        extraPlatforms = 0;
     }
 
+    platformsDiv.textContent = extraPlatforms;
+
+    if(newHighScore) {
+        let highLevelDiv = document.getElementById('high-level');
+        highLevelDiv.textContent = levelDiv.textContent;
+        let highPlatformsDiv = document.getElementById('high-platforms');
+        highPlatformsDiv.textContent = platformsDiv.textContent;
+        highLevel = level;
+        highPlatforms = extraPlatforms;
+    }
+    else if(level === highLevel && extraPlatforms === highPlatforms + 1
+            || level > highLevel) {
+        //update the high score, set newHighScore to true, and display the new high score message
+        highLevel = level;
+        highPlatforms = extraPlatforms;
+        newHighScore = true;
+
+        let highLevelDiv = document.getElementById('high-level');
+        let highPlatformsDiv = document.getElementById('high-platforms');
+        highLevelDiv.textContent = level;
+        highPlatformsDiv.textContent = extraPlatforms;
+
+        highLevelDiv.style.fontWeight = "bold";
+        highLevelDiv.style.color = "white";
+        highPlatformsDiv.style.fontWeight = "bold";
+        highPlatformsDiv.style.color = "white";
+
+        let h1 = document.getElementById('new-high-score').getElementsByTagName('h1')[0];
+        h1.style.opacity = "1";
+
+        setTimeout(() => {
+            highLevelDiv.style.color = "yellow";
+            highLevelDiv.style.fontStyle = "normal";
+            highPlatformsDiv.style.color = "yellow";
+            highPlatformsDiv.style.fontStyle = "normal";
+            h1.style.opacity = "0";
+        }, 1000);
+    } 
+}
+
+function levelUp() {
+    level++;
+    let currLevel = document.getElementById('curr-level');
+    currLevel.style.fontWeight = "bold";
+    currLevel.style.color = "white";
+    let currPlatforms = document.getElementById('curr-platforms');
+    currPlatforms.style.fontWeight = "bold";
+    currPlatforms.style.color = "white";
+
     setTimeout(function() {
-        highScore.style.color = "yellow";
-        highScore.style.fontStyle = "normal";
-        currScore.style.color = "yellow";
-        currScore.style.fontStyle = "normal";
+        currLevel.style.color = "yellow";
+        currLevel.style.fontStyle = "normal";
+        currPlatforms.style.color = "yellow";
+        currPlatforms.style.fontStyle = "normal";
     }, 1010);
     pause();
 
@@ -962,6 +1013,13 @@ function closeLeaderboard() {
 }
 
 function setLeaderboardText() {
+   
+    if(loggedIn) {
+        let container = document.getElementById("login-button-container").children[0];
+        container.style.width = "100%";
+        return;
+    }
+
     if(getWindowWidth() < 600) {
         let loginBox = document.getElementById("login-button-container");
         loginBox.children[0].remove();
@@ -986,7 +1044,10 @@ function setLeaderboardText() {
 
 async function restartGame() {
     pause();
-    currScore.textContent = 1;
+    let highLevelDiv = document.getElementById("high-level");
+    let highPlatformsDiv = document.getElementById("high-platforms");
+    highLevelDiv.textContent = "1";
+    highPlatformsDiv.textContent = "0";
     level = 1;
     gameSpeed = 150;
     height = 1;
@@ -1103,7 +1164,15 @@ function populateUserData(user) {
         loginBox.appendChild(wrapper);
 
         //update highscore
-        highScore.textContent = user.level;
+        highLevel = user.level;
+        highPlatforms = user.extraBlocks;
+        let highLevelDiv = document.getElementById("high-level");
+        highLevelDiv.textContent = user.level;
+        let highPlatformsDiv = document.getElementById("high-platforms");
+        highPlatformsDiv.textContent = user.extraBlocks;
+
+        //set leaderboard text so that it is properly formatted
+        setLeaderboardText();
 
 }
 
@@ -1213,7 +1282,6 @@ async function attemptRegister(e) {
     } 
     else if(data.status === 201) {
     // add the user's information to the web browser and send a cookie so that their information may be stored
-        console.log("User successfully registered");
         username = user_name;
         loggedIn = true;
         closeRegisterPortal();
@@ -1275,13 +1343,17 @@ async function registerUser(user_email, user_name, user_pass) {
     return data;
 }
 
-//REQUIRES: User is logged in to their account
+//REQUIRES: User is logged in to their account and has finished game with higher score than previous high score
 //EFFECTS: Sends a POST request to the server with the user's final score data
 async function postScore() {
     //If the user is logged in, take the user's final score and create a POST request to be evaluated 
     //in the server.js api
     const extraBlocks = height - 2;
-    const userScore = {level, extraBlocks};
+    const user = {
+        username: username,
+        extraBlocks: extraBlocks,
+        level: level
+    }
 
     //JSON object to be passed into api
     const options = {
@@ -1289,11 +1361,12 @@ async function postScore() {
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify(userScore)
+        body: JSON.stringify(user)
     }
     const response = await fetch('/api/updateScore', options)
     const data = await response.json();
-    console.log(data);
+
+    return data;
 }
 
 //EFFECTS: Retrieves the top 25 scores from the database and populates the leaderboard with the data
@@ -1306,6 +1379,10 @@ async function getTopScores() {
     if(data.status === 200) {
         //if the status is 200, then the request was successful
         //populate the leaderboard with the data
+        let leaderboard = document.getElementById("top-scores");
+        while(leaderboard.children.length > 1) {
+            leaderboard.removeChild(leaderboard.lastChild);
+        }
         const scores = data.topScores;
         for(let i = 0; i < scores.length; i++) {
             const container = document.createElement('div');

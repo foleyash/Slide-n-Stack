@@ -130,6 +130,54 @@ export async function getBestScores(users, pool) {
     return topScores;
 }
 
+//REQURIES: user_id is a valid user_id in the database, pool is a valid pool object for the database,
+//          level and platforms form a higher score than the user's current score
+export async function updateUserScore(user_id, users, level, platforms, pool) {
+    
+    const currPlacement = await pool.query(`SELECT placement FROM users WHERE user_id = ?`, [user_id]);
+
+    //update the user's level and extra platforms
+    const [user] = await pool.query(`UPDATE users
+    SET high_level = ?, extra_platforms = ?
+    WHERE user_id = ?`, [level, platforms, user_id]);
+
+    //update the other users's placements if the user's score is less than the updated user's score
+    const placement = updatePlacements(user_id, users, currPlacement[0][0].placement, level, platforms, pool);
+
+    return placement;
+}
+
+export async function updatePlacements(user_id, users, placement, level, platforms, pool) {
+
+    await pool.query(`UPDATE users	
+    SET placement = placement + 1 
+    WHERE placement < ? 
+    AND (high_level < ? OR (high_level = ? AND extra_platforms < ?))`, 
+    [placement, level, level, platforms]);  
+    
+    //find the next best placement within the users array
+    let nextBest = users.length;
+
+    for(let i = 0; i < users.length; i++) {
+        const id = users[i].user_id;
+        const userInfo = await getUserInformation(id, pool);
+        const currPlacement = userInfo.placement;
+        const currLevel = userInfo.high_level;
+        const currPlatforms = userInfo.extra_platforms;
+    
+        if(currPlacement < nextBest && (currLevel < level || (currLevel === level && currPlatforms < platforms))) {
+            nextBest = currPlacement;
+        }
+    }
+
+    //update the user's placement based on the next best placement
+    await pool.query(`UPDATE users
+    SET placement = ?
+    WHERE user_id = ?`, [(nextBest - 1), user_id]);
+
+    return nextBest - 1;
+}
+
 /* Additional functions to create:
 
     updateUserInfo - change placement, high_level, and extra_platforms for user w/ user_id.
@@ -145,4 +193,17 @@ const topScores = await getBestScores(loginInfo, pool);
 console.log(topScores); test("123", pool).then((user) => console.log(user));
 if(await doesUserExist("123", pool)) console.log("user exists");
 else console.log("user does not exist"); */
+
+async function test(user_id, pool) {
+    const currLevel = await pool.query(`SELECT high_level FROM users WHERE user_id = ?`, [user_id]);
+    const currPlatforms = await pool.query(`SELECT extra_platforms FROM users WHERE user_id = ?`, [user_id]);
+    const currPlacement = await pool.query(`SELECT placement FROM users WHERE user_id = ?`, [user_id]);
+
+    console.log(currLevel[0][0].high_level);
+    console.log(currPlatforms[0][0].extra_platforms);
+    console.log(currPlacement[0][0].placement);
+}
+
+//test(50, pool);
+
 
