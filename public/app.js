@@ -319,9 +319,8 @@ async function dropPlatform(firstBlock, blockWidth) {
         else {
             setPlatform(blockWidth, borderWidth);
         }
-
-        updateScore();
         
+        updateScore();
     }
     else if (pos >= topPos + topWidth ||
             pos + topWidth <= topPos) { //blocks placed completely off of the top platform
@@ -391,7 +390,6 @@ async function dropPlatform(firstBlock, blockWidth) {
         floor.appendChild(div);
         fallInterval(fallingBlocks, blockWidth, last);
 
-        updateScore();
     }
     else if (pos > topPos) {
         //placed partially on the tail end of top
@@ -437,7 +435,6 @@ async function dropPlatform(firstBlock, blockWidth) {
         floor.appendChild(div);
         fallInterval(fallingBlocks, blockWidth, last);
 
-        updateScore();
     }
    
     
@@ -521,7 +518,8 @@ async function fallInterval(fallingBlocks, blockWidth, last) {
                     setPlatform(blockWidth, borderWidth);
                     unpause(blockWidth, windowWidth, borderWidth);
                 }
-            
+                
+                updateScore();
             }
             else {
                 //remove the keypress listener for spacebar
@@ -596,7 +594,7 @@ function updateScore() {
     let levelDiv = document.getElementById('curr-level');
     levelDiv.textContent = level;
     let platformsDiv = document.getElementById('curr-platforms');
-    if(extraPlatforms == 7) {
+    if(extraPlatforms === 7) {
         extraPlatforms = 0;
     }
 
@@ -610,8 +608,7 @@ function updateScore() {
         highLevel = level;
         highPlatforms = extraPlatforms;
     }
-    else if(level === highLevel && extraPlatforms === highPlatforms + 1
-            || level > highLevel) {
+    else if((level === highLevel && extraPlatforms > highPlatforms) || level > highLevel) {
         //update the high score, set newHighScore to true, and display the new high score message
         highLevel = level;
         highPlatforms = extraPlatforms;
@@ -1042,19 +1039,22 @@ function setLeaderboardText() {
     signUpButton2.onclick = openRegisterPortal;
 }
 
-async function restartGame() {
+function restartGame() {
     pause();
-    let highLevelDiv = document.getElementById("high-level");
-    let highPlatformsDiv = document.getElementById("high-platforms");
-    highLevelDiv.textContent = "1";
-    highPlatformsDiv.textContent = "0";
     level = 1;
+    extraPlatforms = 0;
     gameSpeed = 150;
     height = 1;
     blocksLeft = 3;
     colorPercent = 20;
     firstBlock = true;
     newHighScore = false;
+
+    let levelDiv = document.getElementById('curr-level');
+    levelDiv.textContent = level;
+    let platformsDiv = document.getElementById('curr-platforms');
+    platformsDiv.textContent = extraPlatforms;
+    
 
     let k = platforms.length;
     for(let i = 0; i < k; i++) {
@@ -1079,6 +1079,9 @@ async function restartGame() {
     floor.appendChild(base);
     setPlatform(blockWidth, borderWidth);
     unpause(blockWidth, windowWidth, borderWidth);
+
+    document.addEventListener("keypress", onSpaceBar);
+    
 }
 
 function gameFinished() {
