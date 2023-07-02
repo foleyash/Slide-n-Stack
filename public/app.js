@@ -104,6 +104,8 @@ restartButton.addEventListener("click", restartGame, false);
 
 leaderboard.addEventListener("click", openLeaderboard, false);
 
+// all event listeners for the login and register portals
+
 closeLoginPortalButton.onclick = closeLoginPortal;
 
 closeRegisterPortalButton.onclick = closeRegisterPortal;
@@ -119,6 +121,12 @@ loginButton2.onclick = openLoginPortal;
 loginForm.onsubmit = attemptLogin;
 
 registerForm.onsubmit = attemptRegister;
+
+// event listener for score info icon
+
+document.getElementById("score-info").addEventListener("mouseenter", openScoreTemplate);
+
+document.getElementById("score-info").addEventListener("mouseleave", closeScoreTemplate);
 
 window.onresize = () => {
     
@@ -1081,6 +1089,91 @@ function restartGame() {
     unpause(blockWidth, windowWidth, borderWidth);
 
     document.addEventListener("keypress", onSpaceBar);
+    
+}
+
+function openScoreTemplate() {
+    document.getElementById("score-info").removeEventListener("mouseenter", openScoreTemplate);
+    let div = document.createElement('div');
+    div.id = "score-template";
+    div.style.fontFamily = "Bruno Ace SC, cursive";
+    let windowWidth = getWindowWidth();
+
+    if(windowWidth < 800) {
+        div.style.width = "0%";
+        div.style.backgroundColor = "red";
+        div.style.transition = ".4s";
+        div.style.overflow = "hidden";
+        div.style.textAlign = "center";
+        div.style.height = "18px";
+        
+        if(windowWidth < 400) {
+            div.style.fontSize = "8px";
+        }
+        else if(windowWidth < 600) {
+            div.style.fontSize = "10px";
+        }
+        else {
+            div.style.fontSize = "12px";
+        }
+        
+        div.style.color = "yellow";
+        div.textContent = "Score = (Level | Platforms)";
+        div.style.border = "1px solid yellow";
+        div.style.padding = "3px";
+
+        document.getElementById("score-container").insertBefore(div, document.getElementById("score-container").children[1]);
+
+        setTimeout(() => {
+            div.style.width = "70%";
+        }, 50);
+
+    }
+    else {
+    let scoreIcon = document.getElementById("score-info");
+
+    let rect = scoreIcon.getBoundingClientRect();
+    div.style.position = "absolute";
+    div.style.top = rect.top + "px";
+    div.style.left = rect.right + "px";
+    div.style.marginLeft = "10px";
+    div.style.width = "0px";
+    div.style.backgroundColor = "red";
+    div.style.transition = ".4s";
+    div.style.overflow = "hidden";
+    div.style.textAlign = "center";
+    div.style.height = "19px";
+    div.style.fontSize = "13px";
+    div.style.color = "yellow";
+    div.textContent = "Score = (Level | Platforms)";
+    div.style.border = "1px solid yellow";
+    div.style.padding = "3px";
+
+    //append the div to the background
+    document.getElementById("background").appendChild(div);
+
+    setTimeout(function() {
+        div.style.width = "300px";
+
+    }, 50);
+
+    }
+    
+}
+
+function closeScoreTemplate() {
+    let div = document.getElementById("score-template");
+
+    div.style.width = "0px";
+    div.style.padding = "0px";
+
+    setTimeout(function() {
+        div.remove();
+    }, 400); 
+
+    setTimeout(function() {
+        document.getElementById("score-info").addEventListener("mouseenter", openScoreTemplate);
+    }, 850); 
     
 }
 

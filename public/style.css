@@ -227,6 +227,21 @@
     font-size: 42px;
     color: yellow;
     font-family: 'Bruno Ace SC';
+    width: fit-content;
+    overflow: visible;
+}
+
+#score-info {
+    font-size: 14px;
+    margin: 7px;
+    position: absolute;
+    top: 0;
+}
+
+#score-info:hover {
+    font-size: 16px;
+    margin-left: 6px;
+    margin-top: 6px;
 }
 
 #new-high-score {
@@ -637,6 +652,17 @@
         font-size: 24px;
     }
 
+    #score-info {
+        font-size: 12px;
+        margin: 5px; 
+    }
+    
+    #score-info:hover {
+        font-size: 14px;
+        margin-left: 4px;
+        margin-top: 4px;
+    }
+
     #instructionX {
         font-size:34px;
     }
@@ -802,6 +828,17 @@
         font-size: 20px;
     }
 
+    #score-info {
+        font-size: 10px;
+        margin: 4px; 
+    }
+    
+    #score-info:hover {
+        font-size: 12px;
+        margin-left: 3px;
+        margin-top: 3px;
+    }
+
     #icon-container-game i {
         font-size: 24px;
         margin: 0 6px;
@@ -940,6 +977,17 @@
 
     #score-container h1 {
         font-size: 12px;
+    }
+
+    #score-info {
+        font-size: 9px;
+        margin: 4px; 
+    }
+    
+    #score-info:hover {
+        font-size: 10px;
+        margin-left: 3px;
+        margin-top: 3px;
     }
 
     #icon-container-game i {
