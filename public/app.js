@@ -272,15 +272,34 @@ function setPlatform(blockWidth, borderWidth) {
 }
 
 function resizePlatforms(childWidth, borderWidth) {
+
+    const baseLeft = px2num(platforms[0].style.left);
+    const originalChildWidth = px2num(platforms[1].style.width) / platforms[1].children.length;
+
     for(let i = 0; i < platforms.length; i++) {
-        if(i == 0) {
+        if(i === 0) {
             platforms[i].style.left = (getWindowWidth() / 2 - 2 * childWidth) + "px";
+            platforms[i].style.height = childWidth + "px";
+            platforms[i].style.top = (-1 * (i + 1) * childWidth) + "px";
+            platforms[i].style.width = (childWidth * platforms[i].childNodes.length) + "px";
             continue;
         }
+        else if (i === platforms.length - 1) {
+            platforms[i].style.height = childWidth + "px";
+            platforms[i].style.width = (childWidth*blocksLeft) + "px";
+            platforms[i].style.top = (-1 * (i + 1) * childWidth) + "px";
+            platforms[i].style.left = borderWidth + "px";
+            continue;
+        }
+
         platforms[i].style.height = childWidth + "px";
-        platforms[i].style.width = (childWidth*blocksLeft) + "px";
-        platforms[i].style.top = (-1 * (i + 1) * childWidth) + "px";
-        platforms[i].style.left = borderWidth + "px";
+        platforms[i].style.width = (childWidth * platforms[i].childNodes.length) + "px";
+        platforms[i].style.top = (childWidth * -1 * (i + 1)) + "px";
+        let diff = px2num(platforms[i].style.left) - baseLeft;
+        let blocksBetween = diff / originalChildWidth;
+        console.log("Original child width: " + originalChildWidth);
+        console.log("Blocks between: " + blocksBetween);
+        platforms[i].style.left = (getWindowWidth() / 2 - 2 * childWidth) + (blocksBetween * childWidth) + "px";
     }
 }
 
@@ -707,9 +726,9 @@ function levelUp() {
 function addBlock() {
     let left = px2num(platforms[0].style.left) + (blockWidth * (blocksLeft - 1 ));
 
-   /* if(left >= windowWidth / 2) {
-        left -= (2 * blockWidth);
-    } */
+    if(left >= (windowWidth / 2) + blockWidth) {
+        left -= (blocksLeft * blockWidth);
+    } 
 
     let div = document.createElement('div');
     div.classList.add("child");
@@ -744,7 +763,12 @@ function addBlock() {
         platforms[0].style.width = (px2num(platforms[0].style.width) + blockWidth) + "px";
         let cell = document.createElement('div');
         cell.classList.add("child");
+        if(left < px2num(platforms[0].style.left)) {
+            platforms[0].style.left = left + "px";
+        }
+        
         platforms[0].appendChild(cell);
+        
     }, 1400);
     
 }
@@ -897,8 +921,10 @@ function closeInstructions() {
         instructions.style.opacity = "100";
         restartButton.style.opacity = "100";
         
+        if(!loadScreen) {
         document.getElementById("score-container").getElementsByTagName('h1')[0].style.opacity = "100";
         document.getElementById("score-container").getElementsByTagName('h1')[1].style.opacity = "100";
+        }
         background.style.border = "none";
     }, 200);
 
@@ -1042,6 +1068,8 @@ function setLeaderboardText() {
 
     loginButton2 = document.getElementById("login-button");
     signUpButton2 = document.getElementById("sign-up-button");
+    loginButton2.style.cursor = "pointer";
+    signUpButton2.style.cursor = "pointer";
 
     loginButton2.onclick = openLoginPortal;
     signUpButton2.onclick = openRegisterPortal;

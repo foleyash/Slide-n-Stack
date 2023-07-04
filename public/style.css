@@ -38,13 +38,6 @@
     top: -60px;
 }
 
-#first-platform {
-    width: 300px;
-    height:100px;
-    position:absolute;
-    top: -200px;
-}
-
 .child {
     width: 60px;
     height:100%;
