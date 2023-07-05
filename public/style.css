@@ -394,10 +394,8 @@
     text-decoration: none;
 }
 
-#login-portal input {
-    width: 100%;
-    margin-bottom: 20px;
-    font-family: "Bruno Ace SC", cursive;
+#login-username {
+    margin-top: 10px;
 }
 
 #login-portal input[type="text"], input[type="password"] {
@@ -409,6 +407,9 @@
     color: #fff;
     font-size: 16px;
     z-index: 1000;
+    width: 100%;
+    margin-bottom: 20px;
+    font-family: "Bruno Ace SC", cursive;
 }
 
 #login-portal input[type="submit"] {
@@ -420,6 +421,9 @@
     font-size: 18px;
     margin-bottom: 10px;
     cursor: pointer;
+    width: 100%;
+    margin-bottom: 20px;
+    font-family: "Bruno Ace SC", cursive;
 }
 
 #login-button-container {
@@ -488,12 +492,6 @@
     text-decoration: none;
 }
 
-#register-portal input {
-    width: 100%;
-    margin-bottom: 15px;
-    font-family: "Bruno Ace SC", cursive;
-}
-
 #register-portal input[type="text"], input[type="password"], input[type="email"] {
     border: none;
     border-bottom: 1px solid #fff;
@@ -503,6 +501,9 @@
     color: #fff;
     font-size: 16px;
     z-index: 1000;
+    width: 100%;
+    margin-bottom: 15px;
+    font-family: "Bruno Ace SC", cursive;
 }
 
 #register-portal input::placeholder {
@@ -518,6 +519,23 @@
     font-size: 18px;
     margin-bottom: 10px;
     cursor: pointer;
+    width: 100%;
+    margin-bottom: 15px;
+    font-family: "Bruno Ace SC", cursive;
+}
+
+.checkbox {
+    color: white;
+    font-family: 'Bruno Ace SC', cursive;
+    font-size: 16px;
+    accent-color: #fb2525;
+}
+
+.checkbox input {
+    background: transparent;
+    border: 1px solid white;
+    cursor: pointer;
+    margin-top: 10px;
 }
 
 @media only screen and (max-width: 1660px) {

@@ -1305,6 +1305,7 @@ async function attemptLogin(e) {
 
     const user_name = document.getElementById("login-username").value;
     const user_pass = document.getElementById("login-pass").value;
+    const rememberMe = document.getElementById("remember-me-login").checked;
 
     const data = await authenticateUser(user_name, user_pass);
 
@@ -1313,6 +1314,10 @@ async function attemptLogin(e) {
         loggedIn = true;
         populateUserData(data);
         closeLoginPortal();
+
+        if(rememberMe) {
+            storeUserData(data);
+        }
     }
     else if (data.status === 401) {
         //username/email not found, prompt user to try again
@@ -1347,6 +1352,7 @@ async function attemptRegister(e) {
     const user_name = document.getElementById("register-username").value;
     const user_pass = document.getElementById("register-pass").value;
     const user_pass_confirm = document.getElementById("register-confirm-pass").value;
+    const rememberMe = document.getElementById("remember-me-register").checked;
 
     //check if the passwords match one another
     //if they do not, clear the password fields and display an error message
@@ -1410,6 +1416,9 @@ async function attemptRegister(e) {
         loggedIn = true;
         closeRegisterPortal();
         populateUserData(data);
+        if(rememberMe) {
+            storeUserData(data);
+        }
     } 
     else { // status == 500 (Internal Server Error)
         console.error("Internal Server Error");
@@ -1533,6 +1542,31 @@ async function getTopScores() {
         console.error("Internal Server Error");
 
     }
+}
+
+//EFFECTS: Creates a cookie that stores the user's stats and username for future use
+function storeUserData(data) {
+    //set the expiration date of the cookie to 30 days from now
+    const date = new Date();
+    date.setTime(date.getTime() + (30 * 24 * 60 * 60 * 1000));
+    let expires = "expires=" + date.toUTCString();
+    //Store the user's data in a cookie
+    document.cookie = `user_name=${data.user_name}; ${expires}`;
+    document.cookie = `high_level=${data.high_level}; ${expires}`;
+    document.cookie = `extra_platforms=${data.extra_platforms}; ${expires}`;
+    document.cookie = `placement=${data.placement}; ${expires}`;
+}
+
+//EFFECTS: Deletes the user's cookie data in the web browser
+function forgetUserData() {
+
+}
+
+function signOut() {
+    //remove the user's data from the application and return them to the default (non-signed-in) state
+
+
+    //remove the user's data from the cookie by calling forgetUserData()
 }
 
 //EFFECTS: Stops the moveInterval which pauses the game
