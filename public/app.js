@@ -51,47 +51,6 @@ var forgotPassButton = document.getElementById("login-portal").getElementsByTagN
 var signUpButton = document.getElementById("login-portal").getElementsByTagName("a")[2];
 var signUpButton2 = document.getElementById("login-button-container").getElementsByTagName("a")[1];
 
-let lavaInterval = window.setInterval(function() {
-    if(wave_up) {
-        wave_size++;
-        let percent = 40 + wave_size;
-        floor.style.backgroundImage = "linear-gradient(red, orange " + percent +  "%, yellow)";
-        
-        if(wave_size >= 20) {
-            wave_up = false;
-        }
-    }
-    else {
-        wave_size--;
-        let percent = 40 + wave_size;
-        floor.style.backgroundImage = "linear-gradient(red, orange " + percent +  "%, yellow)";
-        
-        if(wave_size <= -20) {
-            wave_up = true;
-        }
-    }
-}, 50); 
-
-//populate the leaderboard with the top 25 scores upon loading the page
-getTopScores();
-
-//retrieve the width of child block, window, and border
-
-var blockWidth = getChildWidth();
-var windowWidth = getWindowWidth();
-var borderWidth = getBorderWidth();
-
-//use width of window to set side borders
-
-setBorders(borderWidth);
-setPlatform(blockWidth, borderWidth);
-
-//start moving the platform from right to left
-var moveInterval = window.setInterval(() => {
-    movePlatform(blockWidth, windowWidth, borderWidth);
-}, gameSpeed);
-
-
 // **** EVENT LISTENERS BELOW ****
 
 //icon features for leaderboard, instructions, and play game at start
@@ -127,6 +86,58 @@ registerForm.onsubmit = attemptRegister;
 document.getElementById("score-info").addEventListener("mouseenter", openScoreTemplate);
 
 document.getElementById("score-info").addEventListener("mouseleave", closeScoreTemplate);
+
+
+let lavaInterval = window.setInterval(function() {
+    if(wave_up) {
+        wave_size++;
+        let percent = 40 + wave_size;
+        floor.style.backgroundImage = "linear-gradient(red, orange " + percent +  "%, yellow)";
+        
+        if(wave_size >= 20) {
+            wave_up = false;
+        }
+    }
+    else {
+        wave_size--;
+        let percent = 40 + wave_size;
+        floor.style.backgroundImage = "linear-gradient(red, orange " + percent +  "%, yellow)";
+        
+        if(wave_size <= -20) {
+            wave_up = true;
+        }
+    }
+}, 50); 
+
+//populate the leaderboard with the top 25 scores upon loading the page
+getTopScores();
+
+//retrieve the cookie data if it exists and populate the user data
+let cookieData = getCookieData();
+if(cookieData.placement != null && cookieData.level != ""
+    && cookieData.username != null && cookieData.extraBlocks != "") {
+        loggedIn = true;
+        populateUserData(cookieData);
+}
+
+//retrieve the width of child block, window, and border
+
+var blockWidth = getChildWidth();
+var windowWidth = getWindowWidth();
+var borderWidth = getBorderWidth();
+
+//use width of window to set side borders
+
+setBorders(borderWidth);
+setPlatform(blockWidth, borderWidth);
+
+//start moving the platform from right to left
+var moveInterval = window.setInterval(() => {
+    movePlatform(blockWidth, windowWidth, borderWidth);
+}, gameSpeed);
+
+
+
 
 window.onresize = () => {
     
@@ -834,6 +845,8 @@ function startGame() {
             icons[i].style.transition = "0s";
         }
 
+        iconContainer.style.transition = "0s";
+
         for(let i = 0; i < 2; i++) {
             scores[i].style.transition = "0s";
         }
@@ -1317,6 +1330,7 @@ async function attemptLogin(e) {
 
         if(rememberMe) {
             storeUserData(data);
+            getCookieData();
         }
     }
     else if (data.status === 401) {
@@ -1551,15 +1565,53 @@ function storeUserData(data) {
     date.setTime(date.getTime() + (30 * 24 * 60 * 60 * 1000));
     let expires = "expires=" + date.toUTCString();
     //Store the user's data in a cookie
-    document.cookie = `user_name=${data.user_name}; ${expires}`;
-    document.cookie = `high_level=${data.high_level}; ${expires}`;
-    document.cookie = `extra_platforms=${data.extra_platforms}; ${expires}`;
+    document.cookie = `user_name=${data.username}; ${expires}`;
+    document.cookie = `high_level=${data.level}; ${expires}`;
+    document.cookie = `extra_platforms=${data.extraBlocks}; ${expires}`;
     document.cookie = `placement=${data.placement}; ${expires}`;
+}
+
+//EFFECTS: Retrieves the user's data from the cookie and returns the data as an object
+function getCookieData() {
+    const cDecoded = decodeURIComponent(document.cookie);
+    const cArr = cDecoded.split('; ');
+
+    let cookieData = {
+        username: null,
+        level: null,
+        extraBlocks: null,
+        placement: null
+    };
+
+    cArr.forEach((c) => {
+        if(c.indexOf("placement") == 0) {
+            cookieData.placement = c.substring("placement=".length, c.length);
+        }
+        else if(c.indexOf("user_name") == 0) {
+            cookieData.username = c.substring("user_name=".length, c.length);
+        }
+        else if(c.indexOf("high_level") == 0) {
+            cookieData.level = c.substring("high_level=".length, c.length);
+        }
+        else if(c.indexOf("extra_platforms") == 0) {
+            cookieData.extraBlocks = c.substring("extra_platforms=".length, c.length);
+        }
+    });
+
+    return cookieData;
 }
 
 //EFFECTS: Deletes the user's cookie data in the web browser
 function forgetUserData() {
-
+    //set the expiration date of the cookie to 30 days ago
+    const date = new Date();
+    date.setTime(date.getTime() - (30 * 24 * 60 * 60 * 1000));
+    let expires = "expires=" + date.toUTCString();
+    //Store the user's data in a cookie
+    document.cookie = `user_name=; ${expires}`;
+    document.cookie = `high_level=; ${expires}`;
+    document.cookie = `extra_platforms=; ${expires}`;
+    document.cookie = `placement=; ${expires}`;
 }
 
 function signOut() {
