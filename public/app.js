@@ -33,6 +33,7 @@ setLeaderboardText();
 //user authentication local variables
 var username = "";
 var loggedIn = false;
+var rememberMe = false;
 var highLevel = 1;
 var highPlatforms = 0;
 var viewedPortal = false;
@@ -117,7 +118,11 @@ let cookieData = getCookieData();
 if(cookieData.placement != null && cookieData.level != ""
     && cookieData.username != null && cookieData.extraBlocks != "") {
         loggedIn = true;
+        rememberMe = true;
         populateUserData(cookieData);
+        username = cookieData.username;
+        highLevel = Number(cookieData.level);
+        highPlatforms = Number(cookieData.extraBlocks);
 }
 
 //retrieve the width of child block, window, and border
@@ -292,7 +297,7 @@ function resizePlatforms(childWidth, borderWidth) {
             platforms[i].style.left = (getWindowWidth() / 2 - 2 * childWidth) + "px";
             platforms[i].style.height = childWidth + "px";
             platforms[i].style.top = (-1 * (i + 1) * childWidth) + "px";
-            platforms[i].style.width = (childWidth * platforms[i].childNodes.length) + "px";
+            platforms[i].style.width = (childWidth * platforms[i].children .length) + "px";
             continue;
         }
         else if (i === platforms.length - 1) {
@@ -308,8 +313,6 @@ function resizePlatforms(childWidth, borderWidth) {
         platforms[i].style.top = (childWidth * -1 * (i + 1)) + "px";
         let diff = px2num(platforms[i].style.left) - baseLeft;
         let blocksBetween = diff / originalChildWidth;
-        console.log("Original child width: " + originalChildWidth);
-        console.log("Blocks between: " + blocksBetween);
         platforms[i].style.left = (getWindowWidth() / 2 - 2 * childWidth) + (blocksBetween * childWidth) + "px";
     }
 }
@@ -504,19 +507,18 @@ async function fallInterval(fallingBlocks, blockWidth, last) {
           }
         
             //if at the bottom platform (special case)
-            if(platforms.length - count - 2 == 0 && 
+           if(platforms.length - count - 2 == 0 && 
                 currLeft >= nextLeft && currLeft <= nextLeft + 3 * blockWidth &&
-                level == 1) {
+                level === 1) {
                     let left = fallingBlocks[i].style.left;
                     let top = fallingBlocks[i].style.top;
                    fallingBlocks[i].remove();
                    fallingBlocks[i].style.visibility = 'hidden';
                    blockBreak(left, top, blockWidth);
                     continue;
-            }
-
+            } 
             //check if falling block has landed on existing platform
-            if(currLeft >= nextLeft && currLeft <= nextLeft + nextWidth - blockWidth) {
+            else if(currLeft >= nextLeft && currLeft <= nextLeft + nextWidth - blockWidth) {
                 let left = fallingBlocks[i].style.left;
                 let top = fallingBlocks[i].style.top;
                fallingBlocks[i].remove();
@@ -570,10 +572,15 @@ async function fallInterval(fallingBlocks, blockWidth, last) {
 
                     //if the player received a higher score than the previous high score, post the new score
                     //and update placements
-                    if(highLevel < level || (highLevel == level && extraPlatforms < platforms)) {
-                    postScore()
-                        .then((response) => {populateUserData(response)})
-                        .then(() => {getTopScores()});
+                    if(highLevel < level || (highLevel === level && highPlatforms <= platforms)) {
+                        postScore()
+                            .then((response) => {
+                                populateUserData(response)
+                                if(rememberMe) {
+                                    storeUserData(response);
+                                }
+                            })
+                            .then(() => {getTopScores()});
                     }
                 }
                 
@@ -853,7 +860,7 @@ function startGame() {
 
     }, 1000);
 
-    resizePlatforms(blockWidth);
+    resizePlatforms(blockWidth, borderWidth);
     loadScreen = false;
 
     //add the event listener for the space bar to drop platforms
@@ -1318,7 +1325,7 @@ async function attemptLogin(e) {
 
     const user_name = document.getElementById("login-username").value;
     const user_pass = document.getElementById("login-pass").value;
-    const rememberMe = document.getElementById("remember-me-login").checked;
+    rememberMe = document.getElementById("remember-me-login").checked;
 
     const data = await authenticateUser(user_name, user_pass);
 
@@ -1330,7 +1337,6 @@ async function attemptLogin(e) {
 
         if(rememberMe) {
             storeUserData(data);
-            getCookieData();
         }
     }
     else if (data.status === 401) {
@@ -1366,7 +1372,7 @@ async function attemptRegister(e) {
     const user_name = document.getElementById("register-username").value;
     const user_pass = document.getElementById("register-pass").value;
     const user_pass_confirm = document.getElementById("register-confirm-pass").value;
-    const rememberMe = document.getElementById("remember-me-register").checked;
+    rememberMe = document.getElementById("remember-me-register").checked;
 
     //check if the passwords match one another
     //if they do not, clear the password fields and display an error message
