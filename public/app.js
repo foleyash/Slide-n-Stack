@@ -564,8 +564,10 @@ async function fallInterval(fallingBlocks, blockWidth, last) {
             else {
                 //remove the keypress listener for spacebar
                 document.removeEventListener("keypress", onSpaceBar);
+
                 //gameOver function here
-                
+                gameFinished();
+
                 //post the scores of the user to server.js
                 if(loggedIn) {
                     const platforms = height - 2;
@@ -1225,9 +1227,73 @@ function closeScoreTemplate() {
     
 }
 
+//REQURIES: The game is over
+//MODIFIES: platforms, backgroundColor
+//EFFECTS: The UI of the game turns into a gameover screen prompting the user to play again with information about their score
 function gameFinished() {
     //Create UI effects for gameover
-    
+    let numPlatforms = platforms.length;
+    console.log(platforms.length);
+    let counter = 0;
+    let gameOverBackground;
+    gameOverBackground = document.createElement('div');
+    gameOverBackground.id = "game-over-background";
+
+    let interval = window.setInterval(() => {
+
+        if(counter === numPlatforms) {
+            clearInterval(interval);
+            return;
+        }
+
+        for(let i = 0; i < platforms.length; i++) {
+            platforms[i].style.top = (px2num(platforms[i].style.top) + blockWidth) + "px";
+        }
+
+        if(counter === numPlatforms - 1) {
+            clearInterval(lavaInterval);
+
+            gameOverBackground.style.width = "100vw";
+            gameOverBackground.style.height = "85vh";
+            gameOverBackground.style.position = "absolute";
+            gameOverBackground.style.top = "100vh";
+            gameOverBackground.style.zIndex = "9";
+            background.appendChild(gameOverBackground);
+
+            setTimeout(() => {
+                gameOverBackground.style.transition = ".3s ease-in";
+                gameOverBackground.style.backgroundImage = "linear-gradient(red 40%, orange)";
+                gameOverBackground.style.top = "85vh";
+            }, 10);
+        }
+
+        platforms[0].remove();
+        platforms.shift();
+        counter++;
+        height--;
+    }, 300); 
+
+    setTimeout(() => {
+
+            gameOverBackground.style.transition = "2.5s ease-out";
+            gameOverBackground.style.top = "15vh";
+
+            let gameOverText = document.createElement('h1');
+            gameOverText.textContent = "Game Over";
+            gameOverText.style.color = "yellow";
+            gameOverText.style.fontFamily = "Bruno Ace SC, cursive";
+            gameOverText.style.position = "absolute";
+            gameOverText.style.top = "30%";
+            gameOverText.style.left = "50%";
+            gameOverText.style.transform = "translate(-50%, -50%)";
+            gameOverText.style.fontSize = "50px";
+
+            gameOverBackground.appendChild(gameOverText);
+
+            setTimeout(() => {
+                gameOverBackground.style.transition = "0s";
+            }, 2500);
+    }, (numPlatforms * 300) + 20);
 }
 
 function openLoginPortal() {
