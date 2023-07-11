@@ -9,6 +9,7 @@ var restartButton = document.getElementById("restart-button");
 
 //hide overflow in the window
 document.body.style.overflow = "hidden";
+document.body.style.borderTop = "3px solid white";
 
 base.style.left = (getWindowWidth() / 2 - 2 * getChildWidth()) + "px";
 let wave_up = true;
@@ -92,7 +93,7 @@ document.getElementById("score-info").addEventListener("mouseleave", closeScoreT
 let lavaInterval = window.setInterval(function() {
     if(wave_up) {
         wave_size++;
-        let percent = 40 + wave_size;
+        let percent = 55 + wave_size;
         floor.style.backgroundImage = "linear-gradient(red, orange " + percent +  "%, yellow)";
         
         if(wave_size >= 20) {
@@ -101,7 +102,7 @@ let lavaInterval = window.setInterval(function() {
     }
     else {
         wave_size--;
-        let percent = 40 + wave_size;
+        let percent = 55 + wave_size;
         floor.style.backgroundImage = "linear-gradient(red, orange " + percent +  "%, yellow)";
         
         if(wave_size <= -20) {
@@ -145,7 +146,7 @@ var moveInterval = window.setInterval(() => {
 
 
 window.onresize = () => {
-    
+    if (gameOver) return;
     if(paused) {
         blockWidth = getChildWidth();
         windowWidth = getWindowWidth();
@@ -237,6 +238,11 @@ function setBorders(borderWidth) {
 
     leftBorder.style.width = borderWidth + "px";
     rightBorder.style.width = borderWidth + "px";
+
+    if(loadScreen) {
+        leftBorder.style.borderTop = 'none';
+        rightBorder.style.borderTop = 'none';
+    }
 } 
 
 function getBorderWidth() {
@@ -794,6 +800,7 @@ function addBlock() {
 }
 
 function startGame() {
+    document.body.style.borderTop = "none";
     let scoreContainer = document.getElementById("score-container");
     let scores = scoreContainer.children;
     let iconContainer = document.getElementById("icon-container-game");
@@ -1231,14 +1238,27 @@ function closeScoreTemplate() {
 //MODIFIES: platforms, backgroundColor
 //EFFECTS: The UI of the game turns into a gameover screen prompting the user to play again with information about their score
 function gameFinished() {
-    //Create UI effects for gameover
+    gameOver = true;
+    //Grab the counter variables for the platform submerging interval
     let numPlatforms = platforms.length;
-    console.log(platforms.length);
     let counter = 0;
+
+    //clear the lava movement interval
+    clearInterval(lavaInterval);
+
+    //create a background div to display the game over screen
     let gameOverBackground;
     gameOverBackground = document.createElement('div');
     gameOverBackground.id = "game-over-background";
+    gameOverBackground.style.width = "100%";
+    gameOverBackground.style.height = "85vh";
+    gameOverBackground.style.position = "absolute";
+    gameOverBackground.style.top = "85vh";
+    gameOverBackground.style.zIndex = "9";
+    gameOverBackground.style.backgroundImage = floor.style.backgroundImage;
+    background.appendChild(gameOverBackground);
 
+    //show the stack of platforms becoming covered by lava one by one
     let interval = window.setInterval(() => {
 
         if(counter === numPlatforms) {
@@ -1250,50 +1270,102 @@ function gameFinished() {
             platforms[i].style.top = (px2num(platforms[i].style.top) + blockWidth) + "px";
         }
 
-        if(counter === numPlatforms - 1) {
-            clearInterval(lavaInterval);
-
-            gameOverBackground.style.width = "100vw";
-            gameOverBackground.style.height = "85vh";
-            gameOverBackground.style.position = "absolute";
-            gameOverBackground.style.top = "100vh";
-            gameOverBackground.style.zIndex = "9";
-            background.appendChild(gameOverBackground);
-
-            setTimeout(() => {
-                gameOverBackground.style.transition = ".3s ease-in";
-                gameOverBackground.style.backgroundImage = "linear-gradient(red 40%, orange)";
-                gameOverBackground.style.top = "85vh";
-            }, 10);
-        }
-
         platforms[0].remove();
         platforms.shift();
         counter++;
         height--;
     }, 300); 
 
+    //after the platforms have been covered by lava, show the game over screen
     setTimeout(() => {
 
             gameOverBackground.style.transition = "2.5s ease-out";
+            gameOverBackground.style.backgroundImage = "linear-gradient(to bottom, red, black 99%)";
             gameOverBackground.style.top = "15vh";
+
+            let gameOverTextDiv = document.createElement('div');
+            gameOverTextDiv.style.position = "absolute";
+            gameOverTextDiv.style.top = "15%";
+            gameOverTextDiv.style.left = "50%";
+            gameOverTextDiv.style.width = "80%";
+            gameOverTextDiv.style.height = "fit-content";
+            gameOverTextDiv.style.transform = "translate(-50%, 0%)";
 
             let gameOverText = document.createElement('h1');
             gameOverText.textContent = "Game Over";
-            gameOverText.style.color = "yellow";
-            gameOverText.style.fontFamily = "Bruno Ace SC, cursive";
-            gameOverText.style.position = "absolute";
-            gameOverText.style.top = "30%";
-            gameOverText.style.left = "50%";
-            gameOverText.style.transform = "translate(-50%, -50%)";
-            gameOverText.style.fontSize = "50px";
+            gameOverText.classList.add("game-over-text");
 
-            gameOverBackground.appendChild(gameOverText);
+            let scoreText = document.createElement('h1');
+            scoreText.textContent = "Score: " + level + " | " + numPlatforms;
+            scoreText.classList.add("game-over-sub-text");
+
+            let leaderboardText = document.createElement('h1');
+            leaderboardText.textContent = "Leaderboard";
+            leaderboardText.classList.add("game-over-sub-text");
+            leaderboardText.id = "leaderboard-text-game-over";
+            leaderboardText.style.width = "fit-content";
+            leaderboardText.style.marginLeft = "50%";
+            leaderboardText.style.transform = "translate(-50%, 0%)";
+
+            let playAgainText = document.createElement('h1');
+            playAgainText.innerHTML = `Play Again?`;
+            playAgainText.style.backgroundColor = "black";
+            playAgainText.style.padding = "20px";
+            playAgainText.style.marginTop = "10px";
+            playAgainText.style.borderRadius = "10px";
+            playAgainText.style.border = "1px solid yellow";
+            playAgainText.classList.add("game-over-sub-text");
+            playAgainText.style.width = "fit-content";
+            playAgainText.style.position = "absolute";
+            playAgainText.style.left = "50%";
+            playAgainText.style.transform = "translate(-50%, 0%)";
+            playAgainText.id = "play-again-text";
+
+            let playAgainDiv = document.createElement('div');
+            playAgainDiv.style.width = "100%";
+            playAgainDiv.style.height = "fit-content";
+            //playAgainDiv.style.position = "absolute";
+            playAgainDiv.appendChild(playAgainText);
+
+            gameOverTextDiv.appendChild(gameOverText);
+            gameOverTextDiv.appendChild(scoreText);
+            gameOverTextDiv.appendChild(leaderboardText);
+            gameOverTextDiv.appendChild(playAgainDiv);
+
+            gameOverBackground.appendChild(gameOverTextDiv);
+
+            setTimeout(() => {
+                
+                scoreText.style.opacity = "1";
+                setTimeout(() => {
+                    leaderboardText.style.opacity = "1";
+                    leaderboardText.style.cursor = "pointer";
+                    leaderboardText.onclick = openLeaderboard;
+
+                    setTimeout(() => {
+                        leaderboardText.style.transition = ".5s";
+                    }, 10);
+                }, 350);
+                
+                setTimeout(() => {
+                    playAgainText.style.opacity = "1";
+                    playAgainText.style.cursor = "pointer";
+                    playAgainText.addEventListener("click", () => {
+                        location.reload();
+                    });
+
+                    setTimeout(() => {
+                        playAgainText.style.transition = ".5s";
+                    }, 10);
+                }, 700);
+                
+                
+            }, 1000);
 
             setTimeout(() => {
                 gameOverBackground.style.transition = "0s";
             }, 2500);
-    }, (numPlatforms * 300) + 20);
+    }, (numPlatforms * 300) - 300);
 }
 
 function openLoginPortal() {

@@ -538,6 +538,33 @@
     margin-top: 10px;
 }
 
+.game-over-text {
+    font-size: 64px;
+    color: yellow;
+    font-family: 'Bruno Ace SC', cursive;
+    padding: 20px;
+    text-align: center;
+}
+
+.game-over-sub-text {
+    font-size: 42px;
+    color: yellow;
+    font-family: 'Bruno Ace SC', cursive;
+    padding: 10px;
+    text-align: center;
+    opacity: 0;
+    transition: 1s;
+}
+
+#leaderboard-text-game-over:hover {
+    font-size: 46px;
+}
+
+#play-again-text:hover {
+    font-size: 46px;
+    padding: 25px;
+}
+
 @media only screen and (max-width: 1660px) {
     #base {
         width : 240px;
@@ -614,6 +641,22 @@
 
     #login-button-container p {
         font-size: 14px;
+    }
+
+    .game-over-text {
+        font-size: 54px;
+    }
+
+    .game-over-sub-text {
+        font-size: 36px;
+    }
+
+    #leaderboard-text-game-over:hover {
+        font-size: 40px;
+    }
+
+    #play-again-text:hover {
+        font-size: 40px;
     }
 
 }
@@ -769,6 +812,22 @@
         font-size: 12px;
     }
 
+    .game-over-text {
+        font-size: 46px;
+    }
+
+    .game-over-sub-text {
+        font-size: 24px;
+    }
+
+    #leaderboard-text-game-over:hover {
+        font-size: 27px;
+    }
+
+    #play-again-text:hover {
+        font-size: 27px;
+    }
+
 }
 
 @media only screen and (max-width: 575px),
@@ -921,6 +980,22 @@
         font-size: 10px;
     }
 
+    .game-over-text {
+        font-size: 36px;
+    }
+
+    .game-over-sub-text {
+        font-size: 18px;
+    }
+
+    #leaderboard-text-game-over:hover {
+        font-size: 21px;
+    }
+
+    #play-again-text:hover {
+        font-size: 21px;
+    }
+
 }
 @media only screen and (max-width: 400px) {
     #base {
@@ -1071,6 +1146,22 @@
 
     #login-button-container p {
         font-size: 8px;
+    }
+
+    .game-over-text {
+        font-size: 28px;
+    }
+
+    .game-over-sub-text {
+        font-size: 14px;
+    }
+
+    #leaderboard-text-game-over:hover {
+        font-size: 17px;
+    }
+
+    #play-again-text:hover {
+        font-size: 17px;
     }
 
 }
