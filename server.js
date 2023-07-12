@@ -139,10 +139,30 @@ app.post('/api/register', async (req, res) => {
     }
 });
 
-app.get('/', (req, res) => {
-    console.log('Home page');
-    res.render("/public/index.html");
-    next();
+//REQUIRES: req.body contains a username
+app.post('/api/userData', async (req, res) => {
+    //req.body contains a username
+    //returns a json object containing the user's high level and extra platforms and placement
+    const id = await database.getUserId(req.body.username, database.pool);
+
+    if(id === null) {
+        //send 401 status to client to indicate that the user was not found
+        return res.json({
+            status: 401
+        }).status(401).send();
+    }
+
+    const user = await database.getUserInformation(id, database.pool);
+    
+    //send 200 status to client to indicate that the user was authenticated
+    //and send json object containing the user's high level and extra platforms and placement
+    return res.json({
+        status: 200,
+        username: req.body.username,
+        placement: user.placement,
+        level: user.high_level,
+        extraBlocks: user.extra_platforms
+    }).status(200).send();
 });
 
 

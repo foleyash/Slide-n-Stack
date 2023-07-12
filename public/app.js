@@ -1,3 +1,15 @@
+import {Howl, Howler} from '../howler';
+
+// **** GLOBAL VARIABLES BELOW ****
+
+//Create an audio effects object that holds all the necessary sound effects
+
+var sfx = {
+    "break": new Howl({
+        src: ['audio/BlockBreak.wav']
+    })
+}
+
 let floor = document.getElementById("game-floor");
 let base = document.getElementById("base");
 var playButton = document.getElementById("play-button-start");
@@ -115,16 +127,17 @@ let lavaInterval = window.setInterval(function() {
 getTopScores();
 
 //retrieve the cookie data if it exists and populate the user data
-let cookieData = getCookieData();
-if(cookieData.placement != null && cookieData.level != ""
-    && cookieData.username != null && cookieData.extraBlocks != "") {
+getCookieData().then((cookieData) => {
+    if(cookieData !== null) {
         loggedIn = true;
         rememberMe = true;
         populateUserData(cookieData);
         username = cookieData.username;
         highLevel = Number(cookieData.level);
         highPlatforms = Number(cookieData.extraBlocks);
-}
+    }
+});
+
 
 //retrieve the width of child block, window, and border
 
@@ -345,7 +358,8 @@ function movePlatform(blockWidth, windowWidth, borderWidth) {
             platforms[platforms.length - 1].style.left = (pos + blockWidth) + "px";
             moveRight = true;
         }
-  
+        
+        playSound("break");
 }
 
 async function dropPlatform(firstBlock, blockWidth) {
@@ -1708,41 +1722,54 @@ function storeUserData(data) {
     const date = new Date();
     date.setTime(date.getTime() + (30 * 24 * 60 * 60 * 1000));
     let expires = "expires=" + date.toUTCString();
-    //Store the user's data in a cookie
+    //Store the user's gamertag in a cookie
     document.cookie = `user_name=${data.username}; ${expires}`;
-    document.cookie = `high_level=${data.level}; ${expires}`;
-    document.cookie = `extra_platforms=${data.extraBlocks}; ${expires}`;
-    document.cookie = `placement=${data.placement}; ${expires}`;
 }
 
 //EFFECTS: Retrieves the user's data from the cookie and returns the data as an object
-function getCookieData() {
+async function getCookieData() {
     const cDecoded = decodeURIComponent(document.cookie);
     const cArr = cDecoded.split('; ');
 
-    let cookieData = {
-        username: null,
-        level: null,
-        extraBlocks: null,
-        placement: null
-    };
+    let cookieUserName = null;
+    let userData = null;
 
-    cArr.forEach((c) => {
-        if(c.indexOf("placement") == 0) {
-            cookieData.placement = c.substring("placement=".length, c.length);
-        }
-        else if(c.indexOf("user_name") == 0) {
-            cookieData.username = c.substring("user_name=".length, c.length);
-        }
-        else if(c.indexOf("high_level") == 0) {
-            cookieData.level = c.substring("high_level=".length, c.length);
-        }
-        else if(c.indexOf("extra_platforms") == 0) {
-            cookieData.extraBlocks = c.substring("extra_platforms=".length, c.length);
-        }
-    });
 
-    return cookieData;
+    if(cArr[0].indexOf("user_name") === 0) {
+        cookieUserName = cDecoded.substring("user_name=".length, cDecoded.length);
+    }
+
+    if(cookieUserName !== null) {
+        const data = {
+            username: cookieUserName
+        }
+        const options = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        }
+        const response = await fetch('/api/userData', options);
+
+        if(response.status === 401) {
+            //if the status is 401, then the user is not logged in
+            //remove the cookie and return null
+            forgetUserData();
+        }
+        else if (response.status === 500) {
+            //if the status is 500, then there was an internal server error
+            console.error("Internal Server Error");
+        }
+        else if(response.status === 200) {
+            //if the status is 200, then the request was successful
+            //return the user's data
+            userData = await response.json();
+            return userData;
+        }
+    }
+
+    return null;
 }
 
 //EFFECTS: Deletes the user's cookie data in the web browser
@@ -1751,11 +1778,9 @@ function forgetUserData() {
     const date = new Date();
     date.setTime(date.getTime() - (30 * 24 * 60 * 60 * 1000));
     let expires = "expires=" + date.toUTCString();
-    //Store the user's data in a cookie
+    //Remove the cookie by setting the expiration date to 30 days ago
     document.cookie = `user_name=; ${expires}`;
-    document.cookie = `high_level=; ${expires}`;
-    document.cookie = `extra_platforms=; ${expires}`;
-    document.cookie = `placement=; ${expires}`;
+
 }
 
 function signOut() {
@@ -1763,6 +1788,11 @@ function signOut() {
 
 
     //remove the user's data from the cookie by calling forgetUserData()
+}
+
+function playSound(soundName) {
+    //Plays the audio file of the src that is passed in
+    sfx[soundName].play();
 }
 
 //EFFECTS: Stops the moveInterval which pauses the game
