@@ -15,9 +15,30 @@
 <script>
     var sfx = {
     break: new Howl({
-        src: ['audio/blockBreak.wav'],
+       src: ['audio/break.wav'],
+       volume: 0.5
+    }),
+    splash: new Howl({
+       src: ['audio/splash.wav'], 
+       volume: 0.7
+    }),
+    addBlock: new Howl({
+       src: ['audio/addBlock.wav'],
+       volume: 0.5
+    }),
+    button: new Howl({
+       src: ['audio/button.mp3'],
+       volume: 0.8
+    }),
+    exitButton: new Howl({
+       src: ['audio/exitButton.mp3'],
+       volume: 0.8
+    }),
+    move: new Howl({
+       src: ['audio/move.wav'],
+       volume: 0.5
     })
-}
+} 
 </script>
 <body>
     <div id="background">

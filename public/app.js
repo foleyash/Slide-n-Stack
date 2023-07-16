@@ -1,14 +1,7 @@
-import {Howl, Howler} from '../howler';
-
 // **** GLOBAL VARIABLES BELOW ****
 
 //Create an audio effects object that holds all the necessary sound effects
 
-var sfx = {
-    "break": new Howl({
-        src: ['audio/BlockBreak.wav']
-    })
-}
 
 let floor = document.getElementById("game-floor");
 let base = document.getElementById("base");
@@ -33,6 +26,7 @@ var extraPlatforms = 0;
 var gameSpeed = 150;
 var platforms = [base];
 var colorPercent = 20;
+var colors = ['rgb(80, 14, 14)', 'rgb(230, 39, 39)', 'rgb(95, 185, 21)', 'rgb(11, 109, 238)', 'rgb(106, 31, 150)', 'rgb(42, 18, 65)', 'rgb(12, 11, 11)']
 
 var moveRight = true;
 var paused = false;
@@ -101,7 +95,11 @@ document.getElementById("score-info").addEventListener("mouseenter", openScoreTe
 
 document.getElementById("score-info").addEventListener("mouseleave", closeScoreTemplate);
 
+//initialize the game over and level up intervals
+var gameOverInterval;
+var levelUpInterval;
 
+//begin the lava wave animation
 let lavaInterval = window.setInterval(function() {
     if(wave_up) {
         wave_size++;
@@ -338,7 +336,6 @@ function resizePlatforms(childWidth, borderWidth) {
 
 function movePlatform(blockWidth, windowWidth, borderWidth) {
 
-      
         let pos = px2num(platforms[platforms.length - 1].style.left);
         if(pos + (1 + blocksLeft) * blockWidth <= (windowWidth - borderWidth) && moveRight) {
             //continue moving right
@@ -359,7 +356,6 @@ function movePlatform(blockWidth, windowWidth, borderWidth) {
             moveRight = true;
         }
         
-        playSound("break");
 }
 
 async function dropPlatform(firstBlock, blockWidth) {
@@ -384,7 +380,7 @@ async function dropPlatform(firstBlock, blockWidth) {
         updateScore();
     }
     else if (pos >= topPos + topWidth ||
-            pos + topWidth <= topPos) { //blocks placed completely off of the top platform
+            pos + (blocksLeft * blockWidth) <= topPos) { //blocks placed completely off of the top platform
 
         
         for(let i = 0; i < blocksLeft; i++) {
@@ -636,9 +632,15 @@ function fireballPhysics(fireball) {
         }
         
     }, time)
+
+    //play the fireball splash sound effect
+    playSound("splash");
 }
 
 function blockBreak(left, top, width) {
+
+    //play the block break sound effect
+    playSound("break");
 
     let block = document.createElement('div');
     block.style.position = 'absolute';
@@ -713,6 +715,12 @@ function levelUp() {
     currPlatforms.style.fontWeight = "bold";
     currPlatforms.style.color = "white";
 
+    const firstColorTransition = 5;
+    const secondColorTransition = 8;
+
+    let firstPercent = 0;
+    let secondPercent = 35;
+
     setTimeout(function() {
         currLevel.style.color = "yellow";
         currLevel.style.fontStyle = "normal";
@@ -726,18 +734,27 @@ function levelUp() {
 
     let counter = 0;
     let backgroundColor = document.getElementById('background');
-    let interval = window.setInterval(() => {
+    
+    levelUpInterval = window.setInterval(() => {
 
         if(counter === 6) {
-            clearInterval(interval);
+            clearInterval(levelUpInterval);
         }
 
         for(let i = 0; i < platforms.length; i++) {
             platforms[i].style.top = (px2num(platforms[i].style.top) + blockWidth) + "px";
         }
 
-        colorPercent += 2;
-        backgroundColor.style.backgroundImage = "linear-gradient(rgb(41, 11, 39), rgb(212, 46, 201) " + colorPercent + "%)";
+        //change the background color following the pattern (2nd upcoming, visible upcoming, current, previous)
+        if(level === 6) {
+            backgroundColor.style.backgroundImage = "linear-gradient(" + colors[level+1] + ", " + colors[level] +  
+        " 0%, " + colors[level - 1] + " " + (firstPercent += firstColorTransition) + "%, " + colors[level - 2] + " " + 
+        (secondPercent += secondColorTransition) + "%)";
+        }
+        backgroundColor.style.backgroundImage = "linear-gradient(" + colors[(level+1) % 7] + ", " + colors[(level % 7)] +  
+        " 0%, " + colors[(level - 1) % 7] + " " + (firstPercent += firstColorTransition) + "%, " + colors[(level - 2) % 7] + " " + 
+        (secondPercent += secondColorTransition) + "%)";
+
 
         platforms[0].remove();
         platforms.shift();
@@ -764,6 +781,7 @@ function levelUp() {
 }
 
 function addBlock() {
+    playSound('addBlock');
     let left = px2num(platforms[0].style.left) + (blockWidth * (blocksLeft - 1 ));
 
     if(left >= (windowWidth / 2) + blockWidth) {
@@ -831,12 +849,12 @@ function startGame() {
     iconContainer.style.transition = "1s ease-in-out";
     iconContainer.style.right = "7%";
 
-    for(let i = 0; i < 2; i++) {
+    for(let i = 0; i < scores.length; i++) {
         scores[i].style.transition = "2s";
         scores[i].style.opacity = "1";
     }
 
-    for(let i = 0; i < 3; i++) {
+    for(let i = 0; i < icons.length; i++) {
         icons[i].style.transition = "1s";
         icons[i].style.opacity = "1";
     }
@@ -865,19 +883,19 @@ function startGame() {
         titleText.style.transition = "0s";
         navBar.style.transition = "0s";
         scoreContainer.style.transition = "0s";
-        for(let i = 0; i < 2; i++) {
+        for(let i = 0; i < scores.length; i++) {
             scores[i].style.transition = "0s";
         }
     }, 1000);
 
     setTimeout(function() {
-        for(let i = 0; i < 3; i++) {
+        for(let i = 0; i < icons.length; i++) {
             icons[i].style.transition = "0s";
         }
 
         iconContainer.style.transition = "0s";
 
-        for(let i = 0; i < 2; i++) {
+        for(let i = 0; i < scores.length; i++) {
             scores[i].style.transition = "0s";
         }
 
@@ -892,6 +910,7 @@ function startGame() {
 }
 
 function openInstructions() {
+    playSound('button');
     pause();
     let background = document.getElementById("instructions");
     let textBox = document.getElementById("textBox");
@@ -910,6 +929,7 @@ function openInstructions() {
         restartButton.style.opacity = "0";
         document.getElementById("score-container").getElementsByTagName('h1')[0].style.opacity = "0";
         document.getElementById("score-container").getElementsByTagName('h1')[1].style.opacity = "0";
+        document.getElementById("icon-container-game").getElementsByTagName('h1')[0].style.opacity = "0";
     }
     
     leaderboard.style.opacity = "0";
@@ -939,6 +959,7 @@ function openInstructions() {
 }
 
 function closeInstructions() {
+    playSound('exitButton');
     unpause(blockWidth, windowWidth, borderWidth);
     if(loadScreen) paused = true;
     
@@ -967,6 +988,7 @@ function closeInstructions() {
         if(!loadScreen) {
         document.getElementById("score-container").getElementsByTagName('h1')[0].style.opacity = "100";
         document.getElementById("score-container").getElementsByTagName('h1')[1].style.opacity = "100";
+        document.getElementById("icon-container-game").getElementsByTagName('h1')[0].style.opacity = "100";
         }
         background.style.border = "none";
     }, 200);
@@ -981,6 +1003,7 @@ function closeInstructions() {
 }
 
 function openLeaderboard() {
+    playSound('button');
     pause();
     let background = document.getElementById("leaderboard");
     let topScores = document.getElementById("top-scores");
@@ -1034,7 +1057,10 @@ function openLeaderboard() {
 }
 
 function closeLeaderboard() {
-    unpause(blockWidth, windowWidth, borderWidth);
+    playSound('exitButton');
+    
+    if (!gameOver) {unpause(blockWidth, windowWidth, borderWidth);}
+    
     if(loadScreen) {
         paused = true;
         setTimeout(() => {
@@ -1119,6 +1145,8 @@ function setLeaderboardText() {
 }
 
 function restartGame() {
+    clearInterval(gameOverInterval);
+    clearInterval(levelUpInterval);
     pause();
     level = 1;
     extraPlatforms = 0;
@@ -1157,6 +1185,10 @@ function restartGame() {
     platforms.push(base);
     floor.appendChild(base);
     setPlatform(blockWidth, borderWidth);
+
+    //reset the background to the starting colors
+    let background = document.getElementById("background");
+    background.style.backgroundImage = "linear-gradient(rgb(95, 185, 21), rgb(230, 39, 39) 0%, rgb(80, 14, 14) 30%)"
     unpause(blockWidth, windowWidth, borderWidth);
 
     document.addEventListener("keypress", onSpaceBar);
@@ -1273,10 +1305,10 @@ function gameFinished() {
     background.appendChild(gameOverBackground);
 
     //show the stack of platforms becoming covered by lava one by one
-    let interval = window.setInterval(() => {
+    gameOverInterval = window.setInterval(() => {
 
         if(counter === numPlatforms) {
-            clearInterval(interval);
+            clearInterval(gameOverInterval);
             return;
         }
 
@@ -1365,7 +1397,8 @@ function gameFinished() {
                     playAgainText.style.opacity = "1";
                     playAgainText.style.cursor = "pointer";
                     playAgainText.addEventListener("click", () => {
-                        location.reload();
+                        gameOverBackground.remove();
+                        restartGame();
                     });
 
                     setTimeout(() => {
@@ -1383,6 +1416,9 @@ function gameFinished() {
 }
 
 function openLoginPortal() {
+    if(viewedPortal) {
+        playSound("button");
+    }
     let portal = document.getElementById("login-portal");
     const registerPortal = document.getElementById("register-portal");
     if(registerPortal.style.left === "50%") {
@@ -1402,6 +1438,7 @@ function openLoginPortal() {
 }
 
 function closeLoginPortal() {
+    playSound("exitButton");
     const portal = document.getElementById("login-portal");
     portal.style.left = "40%";
     setTimeout(function() {
@@ -1412,6 +1449,7 @@ function closeLoginPortal() {
 }
 
 function openRegisterPortal() {
+    playSound("button");
     const portal = document.getElementById("register-portal");
     const loginPortal = document.getElementById("login-portal");
     if(loginPortal.style.left === "50%") {
@@ -1429,7 +1467,7 @@ function openRegisterPortal() {
 }
 
 function closeRegisterPortal() {
-    
+    playSound("exitButton");
     const portal = document.getElementById("register-portal");
     portal.style.left = "60%";
     setTimeout(function() {
@@ -1439,36 +1477,45 @@ function closeRegisterPortal() {
 }
 
 function populateUserData(user) {
-        let loginBox = document.getElementById("login-button-container");
-        loginBox.children[0].remove();
-        let wrapper = document.createElement('div');
-        wrapper.classList.add("leaderboard-stats-container");
-        const rankDiv = document.createElement('div');
-        rankDiv.textContent = `${user.placement}`;
-        const gamertagDiv = document.createElement('div');
-        gamertagDiv.textContent = `${user.username}`;
-        const levelDiv = document.createElement('div');
-        levelDiv.textContent = `${user.level}`;
-        const extraBlocksDiv = document.createElement('div');
-        extraBlocksDiv.textContent = `${user.extraBlocks}`;
 
-        wrapper.appendChild(rankDiv);
-        wrapper.appendChild(gamertagDiv);
-        wrapper.appendChild(levelDiv);
-        wrapper.appendChild(extraBlocksDiv);
+    //update leaderboard with the user's data
+    let loginBox = document.getElementById("login-button-container");
+    loginBox.children[0].remove();
+    let wrapper = document.createElement('div');
+    wrapper.classList.add("leaderboard-stats-container");
+    const rankDiv = document.createElement('div');
+    rankDiv.textContent = `${user.placement}`;
+    const gamertagDiv = document.createElement('div');
+    gamertagDiv.textContent = `${user.username}`;
+    const levelDiv = document.createElement('div');
+    levelDiv.textContent = `${user.level}`;
+    const extraBlocksDiv = document.createElement('div');
+    extraBlocksDiv.textContent = `${user.extraBlocks}`;
 
-        loginBox.appendChild(wrapper);
+    wrapper.appendChild(rankDiv);
+    wrapper.appendChild(gamertagDiv);
+    wrapper.appendChild(levelDiv);
+    wrapper.appendChild(extraBlocksDiv);
 
-        //update highscore
-        highLevel = user.level;
-        highPlatforms = user.extraBlocks;
-        let highLevelDiv = document.getElementById("high-level");
-        highLevelDiv.textContent = user.level;
-        let highPlatformsDiv = document.getElementById("high-platforms");
-        highPlatformsDiv.textContent = user.extraBlocks;
+    loginBox.appendChild(wrapper);
 
-        //set leaderboard text so that it is properly formatted
-        setLeaderboardText();
+    //update highscore
+    highLevel = user.level;
+    highPlatforms = user.extraBlocks;
+    let highLevelDiv = document.getElementById("high-level");
+    highLevelDiv.textContent = user.level;
+    let highPlatformsDiv = document.getElementById("high-platforms");
+    highPlatformsDiv.textContent = user.extraBlocks;
+
+    //create hello user message and sign out button
+    let iconContainer = document.getElementById("icon-container-game");
+    iconContainer.appendChild(document.createElement('br'));
+    let helloUser = document.createElement('h1');
+    helloUser.innerHTML = `Hello, ${user.username}`;
+    iconContainer.appendChild(helloUser);
+
+    //set leaderboard text so that it is properly formatted
+    setLeaderboardText();
 
 }
 
