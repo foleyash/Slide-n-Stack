@@ -1,8 +1,5 @@
 // **** GLOBAL VARIABLES BELOW ****
 
-//Create an audio effects object that holds all the necessary sound effects
-
-
 let floor = document.getElementById("game-floor");
 let base = document.getElementById("base");
 var playButton = document.getElementById("play-button-start");
@@ -67,7 +64,7 @@ playButton.addEventListener("click", startGame, false);
 
 instructions.addEventListener("click", openInstructions, false);
 
-restartButton.addEventListener("click", restartGame, false);
+restartButton.addEventListener('click', restartGame, false);
 
 leaderboard.addEventListener("click", openLeaderboard, false);
 
@@ -920,20 +917,23 @@ function openInstructions() {
     background.style.border = "yellow solid 5px";
     X.style.opacity = "100";
     X.style.cursor = "pointer";
+
+    let iconContainer;
     
     if(loadScreen) {
+        iconContainer = document.getElementById("icon-container");
         titleText.style.opacity = "0";
-        playButton.style.opacity = "0";
     }
     else {
-        restartButton.style.opacity = "0";
+        iconContainer = document.getElementById("icon-container-game");
         document.getElementById("score-container").getElementsByTagName('h1')[0].style.opacity = "0";
         document.getElementById("score-container").getElementsByTagName('h1')[1].style.opacity = "0";
-        document.getElementById("icon-container-game").getElementsByTagName('h1')[0].style.opacity = "0";
+    }
+
+    for(let i = 0; i < iconContainer.children.length; i++) {
+        iconContainer.children[i].style.opacity = "0";
     }
     
-    leaderboard.style.opacity = "0";
-    instructions.style.opacity = "0";
 
     setTimeout(function() {
         textBox.getElementsByTagName('h1')[0].style.opacity = "100";
@@ -979,17 +979,21 @@ function closeInstructions() {
     }, 140);
 
     setTimeout(function() {
-        titleText.style.opacity = "100";
-        playButton.style.opacity = "100";
-        leaderboard.style.opacity = "100";
-        instructions.style.opacity = "100";
-        restartButton.style.opacity = "100";
-        
-        if(!loadScreen) {
-        document.getElementById("score-container").getElementsByTagName('h1')[0].style.opacity = "100";
-        document.getElementById("score-container").getElementsByTagName('h1')[1].style.opacity = "100";
-        document.getElementById("icon-container-game").getElementsByTagName('h1')[0].style.opacity = "100";
+        let iconContainer;
+
+        if(loadScreen) {
+            iconContainer = document.getElementById("icon-container");
         }
+        else {
+            iconContainer = document.getElementById("icon-container-game");
+            document.getElementById("score-container").getElementsByTagName('h1')[0].style.opacity = "100";
+            document.getElementById("score-container").getElementsByTagName('h1')[1].style.opacity = "100";
+        }
+
+        for(let i = 0; i < iconContainer.children.length; i++) {
+            iconContainer.children[i].style.opacity = "100";
+        }
+        
         background.style.border = "none";
     }, 200);
 
@@ -1012,21 +1016,24 @@ function openLeaderboard() {
     background.style.height = "50vh";
     background.style.border = "yellow solid 5px";
     topScores.style.border = "white solid 2px";
-    X.style.opacity = "100";
+    X.style.opacity = "1";
     X.style.cursor = "pointer";
+
+    let iconContainer;
     
     if(loadScreen) {
+        iconContainer = document.getElementById("icon-container");
         titleText.style.opacity = "0";
-        playButton.style.opacity = "0";
     }
     else {
-        restartButton.style.opacity = "0";
+        iconContainer = document.getElementById("icon-container-game");
         document.getElementById("score-container").getElementsByTagName('h1')[0].style.opacity = "0";
         document.getElementById("score-container").getElementsByTagName('h1')[1].style.opacity = "0";
     }
 
-    leaderboard.style.opacity = "0";
-    instructions.style.opacity = "0";
+    for(let i = 0; i < iconContainer.children.length; i++) {
+        iconContainer.children[i].style.opacity = "0";
+    }
 
     setTimeout(function() {
         background.getElementsByTagName('h1')[0].style.opacity = "1";
@@ -1034,7 +1041,7 @@ function openLeaderboard() {
     }, 140);
 
     setTimeout(function() {
-        textBox.getElementsByTagName('p')[1].style.opacity = "100";
+        textBox.getElementsByTagName('p')[1].style.opacity = "1";
     }, 220)
 
     X.addEventListener("click", closeLeaderboard);
@@ -1060,22 +1067,28 @@ function closeLeaderboard() {
     playSound('exitButton');
     
     if (!gameOver) {unpause(blockWidth, windowWidth, borderWidth);}
-    
+
     if(loadScreen) {
         paused = true;
-        setTimeout(() => {
+        iconContainer = document.getElementById("icon-container");
+        setTimeout(function() {
             titleText.style.opacity = "1";
-            playButton.style.opacity = "1";
-        }, 220);
+        }, 220)
+        
     }
     else {
-        setTimeout(() => {
-            restartButton.style.opacity = "1";
-            document.getElementById("score-container").getElementsByTagName('h1')[0].style.opacity = "1";
-            document.getElementById("score-container").getElementsByTagName('h1')[1].style.opacity = "1";
-            
-        }, 220);
+        iconContainer = document.getElementById("icon-container-game");
+        setTimeout(function() {
+         document.getElementById("score-container").getElementsByTagName('h1')[0].style.opacity = "1";
+        document.getElementById("score-container").getElementsByTagName('h1')[1].style.opacity = "1";
+        }, 220)
     }
+
+    setTimeout(function() {
+        for(let i = 0; i < iconContainer.children.length; i++) {
+            iconContainer.children[i].style.opacity = "1";
+        }
+    }, 220)
 
     let background = document.getElementById("leaderboard");
     let topScores = document.getElementById("top-scores");
@@ -1145,8 +1158,6 @@ function setLeaderboardText() {
 }
 
 function restartGame() {
-    clearInterval(gameOverInterval);
-    clearInterval(levelUpInterval);
     pause();
     level = 1;
     extraPlatforms = 0;
@@ -1156,6 +1167,7 @@ function restartGame() {
     colorPercent = 20;
     firstBlock = true;
     newHighScore = false;
+    gameOver = false;
 
     let levelDiv = document.getElementById('curr-level');
     levelDiv.textContent = level;
@@ -1509,10 +1521,29 @@ function populateUserData(user) {
 
     //create hello user message and sign out button
     let iconContainer = document.getElementById("icon-container-game");
+    let currHTML = iconContainer.innerHTML;
+    let newHTML = currHTML + `<i id="sign-out-button" class="fa-solid fa-right-from-bracket" style="color: #ffff00;"></i>`;
+    iconContainer.innerHTML = newHTML;
     iconContainer.appendChild(document.createElement('br'));
     let helloUser = document.createElement('h1');
     helloUser.innerHTML = `Hello, ${user.username}`;
     iconContainer.appendChild(helloUser);
+
+    //add sign out button functionality
+    let signOutButton = document.getElementById("sign-out-button");
+    signOutButton.addEventListener("click", () => {
+        signOut();
+    });
+
+    if(!loadScreen) {
+        leaderboard = document.getElementById("leaderboard-game");     
+        instructions = document.getElementById('instructions-game');
+    }
+
+    leaderboard.addEventListener("click", openLeaderboard);
+    instructions.addEventListener("click", openInstructions);
+    restartButton = document.getElementById("restart-button");
+    restartButton.addEventListener("click", restartGame);
 
     //set leaderboard text so that it is properly formatted
     setLeaderboardText();
@@ -1537,6 +1568,9 @@ async function attemptLogin(e) {
         if(rememberMe) {
             storeUserData(data);
         }
+
+        document.getElementById("login-username").value = "";
+        document.getElementById("login-pass").value = "";
     }
     else if (data.status === 401) {
         //username/email not found, prompt user to try again
@@ -1638,6 +1672,13 @@ async function attemptRegister(e) {
         if(rememberMe) {
             storeUserData(data);
         }
+
+        //clear the register form
+        document.getElementById("register-email").value = "";
+        document.getElementById("register-username").value = "";
+        document.getElementById("register-pass").value = "";
+        document.getElementById("register-confirm-pass").value = "";
+
     } 
     else { // status == 500 (Internal Server Error)
         console.error("Internal Server Error");
@@ -1830,11 +1871,44 @@ function forgetUserData() {
 
 }
 
+function openSignOutPortal() {
+
+}
+
+//REQUIRES: User is logged in to their account
+//MODIFIES: UI of high score, login box, and removes the sign out button
+//EFFECTS: Signs the user out of their account and removes their data from the application as well as from any cookies
+//         that may be stored in the web browser
 function signOut() {
     //remove the user's data from the application and return them to the default (non-signed-in) state
+    username = "";
+    loggedIn = false;
+    highLevel = 1;
+    extraPlatforms = 0;
 
+    let loginBox = document.getElementById("login-button-container");
+    loginBox.children[0].remove();
+    loginBox.innerHTML = `<p>Want to add your score to the leaderboards? <a href="#">Login</a> or <a href="#">sign up</a> today!</p>`;
+
+    const highLevelDiv = document.getElementById("high-level");
+    highLevelDiv.textContent = `${highLevel}`;
+    const extraPlatformsDiv = document.getElementById("high-platforms");
+    extraPlatformsDiv.textContent = `${extraPlatforms}`;
+
+    //remove the sign out button and the user's gamertag from the UI
+    document.getElementById("sign-out-button").remove();
+    document.getElementById("icon-container-game").getElementsByTagName('br')[0].remove();
+    document.getElementById("icon-container-game").getElementsByTagName('h1')[0].remove();
+
+    //set the new login and sign up buttons
+    signUpButton2 = loginBox.getElementsByTagName('a')[1];
+    loginButton2 = loginBox.getElementsByTagName('a')[0];
+
+    signUpButton2.addEventListener('click', openRegisterPortal);
+    loginButton2.addEventListener('click', openLoginPortal);
 
     //remove the user's data from the cookie by calling forgetUserData()
+    forgetUserData();
 }
 
 function playSound(soundName) {
