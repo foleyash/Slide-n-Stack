@@ -37,7 +37,12 @@
     move: new Howl({
        src: ['audio/move.wav'],
        volume: 0.5
-    })
+    }), 
+    gameMusic: new Howl({
+       src: ['audio/preGameMusic.mp3'],
+       volume: 0.5,
+       loop: true
+    }),
 } 
 </script>
 <body>
@@ -66,6 +71,8 @@
                 <i id="restart-button" class="fa-solid fa-rotate-right" style="color: #ffff00;"></i>
                 <i id="instructions-game" class="fa-solid fa-clipboard-question" style="color: #ffff00;"></i>
                 <i id="leaderboard-game" class="fa-solid fa-trophy" style="color: #ffff00;"></i>
+                <i id="mute-button" class="fa-solid fa-volume-high" style="color: #ffff00;"></i>
+                <i id="unmute-button" class="fa-solid fa-volume-xmark" style="color: #ffff00;"></i>
             </div>
         </div>
         

@@ -8,6 +8,7 @@ var navBar = document.getElementById("nav-bar");
 var instructions = document.getElementById("instructions-start");
 var leaderboard = document.getElementById("leaderboard-start");
 var restartButton = document.getElementById("restart-button");
+var muteButton = document.getElementById("mute-button");
 
 //hide overflow in the window
 document.body.style.overflow = "hidden";
@@ -31,6 +32,7 @@ var firstBlock = true;
 var gameOver = false;
 var newHighScore = false;
 var loadScreen = true;
+var mute = false;
 
 setLeaderboardText();
 
@@ -357,6 +359,7 @@ function movePlatform(blockWidth, windowWidth, borderWidth) {
 
 async function dropPlatform(firstBlock, blockWidth) {
 
+    playSound('move');
     let last = false;
     let pos = px2num(platforms[platforms.length - 1].style.left); 
     let top = px2num(platforms[platforms.length - 1].style.top);
@@ -738,6 +741,7 @@ function levelUp() {
             clearInterval(levelUpInterval);
         }
 
+        playSound("break");
         for(let i = 0; i < platforms.length; i++) {
             platforms[i].style.top = (px2num(platforms[i].style.top) + blockWidth) + "px";
         }
@@ -829,6 +833,7 @@ function addBlock() {
 }
 
 function startGame() {
+    playSound('gameMusic');
     document.body.style.borderTop = "none";
     let scoreContainer = document.getElementById("score-container");
     let scores = scoreContainer.children;
@@ -867,8 +872,10 @@ function startGame() {
         instructions.addEventListener("click", openInstructions, false);
         leaderboard = document.getElementById("leaderboard-game");
         leaderboard.addEventListener("click", openLeaderboard, false);
+        
+        //set the mute button event to the mute button icon on click
+        document.getElementById('mute-button').addEventListener('click', muteGame, false);
 
-        leaderboard = document.getElementById("leaderboard-game");
     }, 500);
 
     navBar.style.transition = ".7s ease-in-out"
@@ -983,6 +990,7 @@ function closeInstructions() {
 
         if(loadScreen) {
             iconContainer = document.getElementById("icon-container");
+            titleText.style.opacity = "1";
         }
         else {
             iconContainer = document.getElementById("icon-container-game");
@@ -1125,6 +1133,28 @@ function closeLeaderboard() {
     
 }
 
+function muteGame() {
+    for(var key in sfx) {
+        sfx[key].pause();
+    }
+    mute = true;
+
+    document.getElementById('icon-container-game').children[3].style.display = "none";
+    document.getElementById('icon-container-game').children[4].style.display = "inline";
+    document.getElementById('icon-container-game').children[3].removeEventListener("click", muteGame, false);
+    document.getElementById('icon-container-game').children[4].addEventListener("click", unMuteGame, false);
+}
+
+function unMuteGame() {
+    sfx['gameMusic'].play();
+    mute = false;
+
+    document.getElementById('icon-container-game').children[4].style.display = "none";
+    document.getElementById('icon-container-game').children[3].style.display = "inline";
+    document.getElementById('icon-container-game').children[3].addEventListener("click", muteGame, false);
+    document.getElementById('icon-container-game').children[4].removeEventListener("click", unMuteGame, false);
+}
+
 function setLeaderboardText() {
    
     if(loggedIn) {
@@ -1158,6 +1188,10 @@ function setLeaderboardText() {
 }
 
 function restartGame() {
+    sfx['gameMusic'].stop();
+    if(!mute) {
+        playSound('gameMusic');
+    }
     pause();
     level = 1;
     extraPlatforms = 0;
@@ -1337,6 +1371,28 @@ function gameFinished() {
     //after the platforms have been covered by lava, show the game over screen
     setTimeout(() => {
 
+        //remove the event listeners for each icon
+        restartButton.removeEventListener('click', restartGame);
+        instructions.removeEventListener('click', openInstructions);
+        leaderboard.removeEventListener('click', openLeaderboard);
+        muteButton.removeEventListener('click', muteGame);
+        document.getElementById("sign-out-button").removeEventListener('click', openSignOutPortal);
+
+        document.getElementById("score-info").removeEventListener("mouseenter", openScoreTemplate);
+
+        document.getElementById("score-info").removeEventListener("mouseleave", closeScoreTemplate);
+
+        let iconContainer = document.getElementById("icon-container-game");
+        let scoreContainer = document.getElementById("score-container");
+        for(let i = 0; i < iconContainer.children.length; i++) {
+            iconContainer.children[i].style.opacity = "0";
+            iconContainer.children[i].style.cursor = "normal";
+        }
+
+        for(let i = 0; i < scoreContainer.children.length; i++) {
+            scoreContainer.children[i].style.opacity = "0";
+        }
+
             gameOverBackground.style.transition = "2.5s ease-out";
             gameOverBackground.style.backgroundImage = "linear-gradient(to bottom, red, black 99%)";
             gameOverBackground.style.top = "15vh";
@@ -1354,7 +1410,7 @@ function gameFinished() {
             gameOverText.classList.add("game-over-text");
 
             let scoreText = document.createElement('h1');
-            scoreText.textContent = "Score: " + level + " | " + numPlatforms;
+            scoreText.textContent = "Score: " + level + " | " + extraPlatforms;
             scoreText.classList.add("game-over-sub-text");
 
             let leaderboardText = document.createElement('h1');
@@ -1411,6 +1467,30 @@ function gameFinished() {
                     playAgainText.addEventListener("click", () => {
                         gameOverBackground.remove();
                         restartGame();
+
+                        for(let i = 0; i < iconContainer.children.length; i++) {
+                            iconContainer.children[i].style.opacity = "1";
+                            iconContainer.children[i].style.cursor = "pointer";
+                        }
+                        restartButton = document.getElementById("restart-button");
+                        restartButton.addEventListener('click', restartGame);
+                        leaderboard = document.getElementById("leaderboard-game");
+                        leaderboard.addEventListener('click', openLeaderboard);
+                        instructions = document.getElementById("instructions-game");
+                        instructions.addEventListener('click', openInstructions);
+                        muteButton = document.getElementById("mute-button");
+                        muteButton.addEventListener('click', muteGame);
+                        let signOutButton = document.getElementById("sign-out-button");
+                        signOutButton.addEventListener('click', openSignOutPortal);
+
+                        for(let i = 0; i < scoreContainer.children.length; i++) {
+                            scoreContainer.children[i].style.opacity = "1";
+                        }
+
+                        document.getElementById("score-info").addEventListener("mouseenter", openScoreTemplate);
+
+                        document.getElementById("score-info").addEventListener("mouseleave", closeScoreTemplate);
+
                     });
 
                     setTimeout(() => {
@@ -1519,7 +1599,8 @@ function populateUserData(user) {
     let highPlatformsDiv = document.getElementById("high-platforms");
     highPlatformsDiv.textContent = user.extraBlocks;
 
-    //create hello user message and sign out button
+    //create hello user message and sign out button if the user hasn't already logged in before
+    if(document.getElementById("sign-out-button") === null) {
     let iconContainer = document.getElementById("icon-container-game");
     let currHTML = iconContainer.innerHTML;
     let newHTML = currHTML + `<i id="sign-out-button" class="fa-solid fa-right-from-bracket" style="color: #ffff00;"></i>`;
@@ -1531,9 +1612,7 @@ function populateUserData(user) {
 
     //add sign out button functionality
     let signOutButton = document.getElementById("sign-out-button");
-    signOutButton.addEventListener("click", () => {
-        signOut();
-    });
+    signOutButton.addEventListener("click", openSignOutPortal);
 
     if(!loadScreen) {
         leaderboard = document.getElementById("leaderboard-game");     
@@ -1544,9 +1623,13 @@ function populateUserData(user) {
     instructions.addEventListener("click", openInstructions);
     restartButton = document.getElementById("restart-button");
     restartButton.addEventListener("click", restartGame);
-
+    }
     //set leaderboard text so that it is properly formatted
     setLeaderboardText();
+
+}
+
+function setIcons() {
 
 }
 
@@ -1667,8 +1750,9 @@ async function attemptRegister(e) {
     // add the user's information to the web browser and send a cookie so that their information may be stored
         username = user_name;
         loggedIn = true;
-        closeRegisterPortal();
         populateUserData(data);
+        closeRegisterPortal();
+        
         if(rememberMe) {
             storeUserData(data);
         }
@@ -1872,7 +1956,7 @@ function forgetUserData() {
 }
 
 function openSignOutPortal() {
-
+    signOut();
 }
 
 //REQUIRES: User is logged in to their account
@@ -1913,7 +1997,7 @@ function signOut() {
 
 function playSound(soundName) {
     //Plays the audio file of the src that is passed in
-    sfx[soundName].play();
+    if(!mute) sfx[soundName].play();
 }
 
 //EFFECTS: Stops the moveInterval which pauses the game

@@ -86,12 +86,13 @@
     transition: .5s;
     z-index: 8;
     text-align: right;
+    line-height: 150%;
 }
 
 #icon-container-game i {
     opacity: 0;
     font-size: 70px;
-    margin: 0 20px;
+    margin: 10px;
     z-index:8;
     cursor: pointer;
 }
@@ -101,7 +102,10 @@
     opacity: 0;
     font-family: 'Bruno Ace SC', cursive;
     color: yellow;
-    margin-top: 10px;
+}
+
+#unmute-button {
+    display: none;
 }
 
 #play-container {
@@ -637,7 +641,10 @@
 
     #icon-container-game i {
         font-size: 50px;
-        margin: 0 15px;
+    }
+
+    #icon-container-game h1 {
+        font-size: 24px;
     }
 
     #new-high-score h1 {
@@ -667,6 +674,19 @@
     #play-again-text:hover {
         font-size: 40px;
     }
+
+}
+
+@media only screen and (max-width: 1000px),
+        screen and (max-height: 900px) {
+
+        #icon-container-game i {
+            font-size: 42px;
+        }
+
+        #score-container h1 {
+            font-size: 28px;
+        }
 
 }
 
@@ -736,8 +756,13 @@
 
     #icon-container-game i {
         font-size: 36px;
-        margin: 0 10px;
+        margin: 0 6px;
     }
+
+    #icon-container-game h1 {
+        font-size: 18px;
+    }
+
     #new-high-score {
         width: 120px;
         margin-left:-60px;
@@ -923,6 +948,10 @@
         margin: 0 6px;
     }
 
+    #icon-container-game h1 {
+        font-size: 14px;
+    }
+
     #new-high-score h1 {
         font-size: 24px;
     }
@@ -1088,6 +1117,10 @@
     #icon-container-game i {
         font-size: 16px;
         margin: 0 4px;
+    }
+
+    #icon-container-game h1 {
+        font-size: 8px;
     }
 
     #new-high-score h1 {
