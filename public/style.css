@@ -78,21 +78,23 @@
 }
 
 #icon-container-game {
-    width: 30%;
-    height: 15vh;
+    width: 300px;
+    height: fit-content;
     position: absolute;
     right:-25%;
     top:20vh;
     transition: .5s;
     z-index: 8;
-    text-align: right;
-    line-height: 150%;
+    display:grid;
+    grid-template-columns: repeat(4, 25%);
+    gap: 10px;
+    text-align: center;
 }
 
 #icon-container-game i {
     opacity: 0;
     font-size: 70px;
-    margin: 10px;
+    margin-bottom: 10px;
     z-index:8;
     cursor: pointer;
 }
@@ -578,6 +580,82 @@
     padding: 25px;
 }
 
+#sign-out-portal {
+    background-color: rgb(0, 0, 0);
+    width: 50%;
+    height: 0;
+    position: absolute;
+    left:50%;
+    margin-left: -25%;
+    top:20vh;
+    transition: .5s;
+    z-index: 10;
+    border: 0px solid black;
+    border-radius: 15px;
+}
+
+#sign-out-portal h1 {
+    position: absolute;
+    width: 80%;
+    top: 25%;
+    left: 50%;
+    margin-left: -40%;
+    text-align: center;
+    color: yellow;
+    font-family: "Bruno Ace SC", cursive;
+    padding-bottom: 10px;
+    text-align: center;
+    font-size: 42px;
+    opacity: 0;
+}
+
+#sign-out-portal div {
+    position: absolute;
+    top: 60%;
+    left: 10%;
+    width: 80%;
+    height: fit-content;
+}
+
+#sign-out-portal button:nth-child(1) {
+    opacity: 0;
+    font-family: 'Bruno Ace SC', cursive;
+    position: absolute;
+    left: 15%;
+    background-color: rgb(12, 202, 21);
+    width: 100px;
+    height: 80px;
+    padding: 5px;
+    text-align: center;
+    font-size: 24px;
+}
+
+#sign-out-portal button:nth-child(2) {
+    opacity: 0;
+    font-family: 'Bruno Ace SC', cursive;
+    position: absolute;
+    right: 15%;
+    background-color: #fb2525;
+    width: 100px;
+    height: 80px;
+    padding: 5px;
+    text-align: center;
+    font-size: 24px;
+}
+
+#sign-out-x {
+    position: absolute;
+    right:0;
+    margin-right: 5%;
+    margin-top: 3%;
+    font-size: 42px;
+    display: none;
+}
+
+#sign-out-x:hover {
+    font-size: 46px;
+}
+
 @media only screen and (max-width: 1660px) {
     #base {
         width : 240px;
@@ -639,6 +717,10 @@
         font-size: 36px;
     }
 
+    #icon-container-game {
+        width: 240px;
+    }
+
     #icon-container-game i {
         font-size: 50px;
     }
@@ -675,6 +757,7 @@
         font-size: 40px;
     }
 
+
 }
 
 @media only screen and (max-width: 1000px),
@@ -686,6 +769,14 @@
 
         #score-container h1 {
             font-size: 28px;
+        }
+
+        #leaderboard-title {
+            margin-top: 7%;
+        }
+
+        #sign-out-portal h1 {
+            font-size: 36px;
         }
 
 }
@@ -716,6 +807,10 @@
 
     #leaderboard-start {
         font-size: 50px;
+    }
+
+    #leaderboard-title {
+        margin-top: 10%;
     }
 
     #icon-container {
@@ -754,9 +849,12 @@
         font-size: 38px;
     }
 
+    #icon-container-game {
+        width: 180px;
+    }
+
     #icon-container-game i {
         font-size: 36px;
-        margin: 0 6px;
     }
 
     #icon-container-game h1 {
@@ -789,6 +887,14 @@
     }
 
     #leaderboardX:hover {
+        font-size: 38px;
+    }
+
+    #sign-out-x {
+        font-size: 30px;
+    }
+
+    #sign-out-x:hover {
         font-size: 38px;
     }
 
@@ -862,6 +968,24 @@
         font-size: 27px;
     }
 
+    #sign-out-portal button:nth-child(1) {
+        font-size: 18px;
+        width: 80px;
+        height: 63px;
+        left: 10%;
+    }
+
+    #sign-out-portal button:nth-child(2) {
+        font-size: 18px;
+        width: 80px;
+        height: 63px;
+        right: 10%;
+    }
+
+    #sign-out-portal h1 {
+        font-size: 22px;
+    }
+
 }
 
 @media only screen and (max-width: 575px),
@@ -914,6 +1038,14 @@
         font-size: 32px;
     }
 
+    #sign-out-x {
+        font-size: 28px;
+    }
+
+    #sign-out-x:hover {
+        font-size: 32px;
+    }
+
     #leaderboard-title {
         margin-top: 10%;
         font-size: 18px;
@@ -929,7 +1061,7 @@
     }
 
     #score-container h1 {
-        font-size: 20px;
+        font-size: 16px;
     }
 
     #score-info {
@@ -943,9 +1075,12 @@
         margin-top: 3px;
     }
 
+    #icon-container-game {
+        width: 120px;
+    }
+
     #icon-container-game i {
         font-size: 24px;
-        margin: 0 6px;
     }
 
     #icon-container-game h1 {
@@ -958,6 +1093,10 @@
 
     .leaderboard-stats-container div {
         font-size: 10px;
+    }
+
+    #leaderboard-title {
+        margin-top: 15%;
     }
 
     #login-portal {
@@ -1034,6 +1173,24 @@
         font-size: 21px;
     }
 
+    #sign-out-portal button:nth-child(1) {
+        font-size: 14px;
+        width: 60px;
+        height: 48px;
+        left: 10%;
+    }
+
+    #sign-out-portal button:nth-child(2) {
+        font-size: 14px;
+        width: 60px;
+        height: 48px;
+        right: 10%;
+    }
+
+    #sign-out-portal h1 {
+        font-size: 16px;
+    }
+
 }
 @media only screen and (max-width: 400px) {
     #base {
@@ -1085,8 +1242,16 @@
         font-size: 24px;
     }
 
+    #sign-out-x {
+        font-size: 20px;
+    }
+
+    #sign-out-x:hover {
+        font-size: 24px;
+    }
+
     #leaderboard-title {
-        margin-top: 16%;
+        margin-top: 20%;
         font-size: 14px;
     }
 
@@ -1114,9 +1279,12 @@
         margin-top: 3px;
     }
 
+    #icon-container-game {
+        width: 90px;
+    }
+
     #icon-container-game i {
         font-size: 16px;
-        margin: 0 4px;
     }
 
     #icon-container-game h1 {
@@ -1204,6 +1372,25 @@
 
     #play-again-text:hover {
         font-size: 17px;
+    }
+
+    #sign-out-portal button:nth-child(1) {
+        font-size: 11px;
+        width: 45px;
+        height: 36px;
+        left: 10%;
+    }
+
+    #sign-out-portal button:nth-child(2) {
+        font-size: 11px;
+        width: 45px;
+        height: 36px;
+        right: 10%;
+    }
+
+    #sign-out-portal h1 {
+        top: 30%;
+        font-size: 14px;
     }
 
 }

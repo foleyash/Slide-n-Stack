@@ -849,7 +849,7 @@ function startGame() {
     scoreContainer.style.transition = "1s ease-in-out";
     scoreContainer.style.left = "5%";
     iconContainer.style.transition = "1s ease-in-out";
-    iconContainer.style.right = "7%";
+    iconContainer.style.right = "10%";
 
     for(let i = 0; i < scores.length; i++) {
         scores[i].style.transition = "2s";
@@ -1568,6 +1568,63 @@ function closeRegisterPortal() {
     }, 300);
 }
 
+function openSignOutPortal() {
+
+    playSound('button');
+    pause();
+    const portal = document.getElementById("sign-out-portal");
+    let X = document.getElementById("sign-out-x");
+
+    portal.style.height = "50vh";
+    portal.style.border = "yellow solid 5px";
+    X.style.display = "block";
+    X.style.cursor = "pointer";
+
+    let iconContainer;
+    
+    if(loadScreen) {
+        iconContainer = document.getElementById("icon-container");
+        titleText.style.opacity = "0";
+    }
+    else {
+        iconContainer = document.getElementById("icon-container-game");
+        document.getElementById("score-container").getElementsByTagName('h1')[0].style.opacity = "0";
+        document.getElementById("score-container").getElementsByTagName('h1')[1].style.opacity = "0";
+    }
+
+    for(let i = 0; i < iconContainer.children.length; i++) {
+        iconContainer.children[i].style.opacity = "0";
+    }
+
+    setTimeout(function() {
+        portal.getElementsByTagName('h1')[0].style.opacity = "1";
+        
+    }, 140);
+
+    setTimeout(function() {
+        portal.getElementsByTagName('div')[0].children[0].style.opacity = "1";
+        portal.getElementsByTagName('div')[0].children[1].style.opacity = "1";
+    }, 220)
+
+    X.addEventListener("click", closeSignOutPortal);
+    restartButton.removeEventListener("click", restartGame, false);
+    instructions.removeEventListener("click", openInstructions, false);
+    leaderboard.removeEventListener("click", openLeaderboard, false);
+    restartButton.style.cursor = "auto";
+    instructions.style.cursor = "auto";
+    leaderboard.style.cursor = "auto";
+
+    //remove the event listener for key presses
+    if(!loadScreen) {
+        document.removeEventListener("keypress", onSpaceBar);
+    }
+
+}
+
+function closeSignOutPortal() {
+
+}
+
 function populateUserData(user) {
 
     //update leaderboard with the user's data
@@ -1609,6 +1666,9 @@ function populateUserData(user) {
     let helloUser = document.createElement('h1');
     helloUser.innerHTML = `Hello, ${user.username}`;
     iconContainer.appendChild(helloUser);
+
+    //change the grid template columns to accomodate the new icon
+    iconContainer.style.gridTemplateColumns = "repeat(3, 33%)";
 
     //add sign out button functionality
     let signOutButton = document.getElementById("sign-out-button");
@@ -1955,9 +2015,6 @@ function forgetUserData() {
 
 }
 
-function openSignOutPortal() {
-    signOut();
-}
 
 //REQUIRES: User is logged in to their account
 //MODIFIES: UI of high score, login box, and removes the sign out button
