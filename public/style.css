@@ -106,8 +106,13 @@
     color: yellow;
 }
 
+#mute-button {
+    grid-column-start: 4;
+}
+
 #unmute-button {
     display: none;
+    grid-column-start: 4;
 }
 
 #play-container {
@@ -606,7 +611,7 @@
     padding-bottom: 10px;
     text-align: center;
     font-size: 42px;
-    opacity: 0;
+    display: none;
 }
 
 #sign-out-portal div {
@@ -620,6 +625,8 @@
 #sign-out-portal button:nth-child(1) {
     opacity: 0;
     font-family: 'Bruno Ace SC', cursive;
+    font-weight: bold;
+    color: yellow;
     position: absolute;
     left: 15%;
     background-color: rgb(12, 202, 21);
@@ -628,11 +635,21 @@
     padding: 5px;
     text-align: center;
     font-size: 24px;
+    border: 3px solid yellow;
+    border-radius: 15px;
+    transition: .3s;
+}
+
+#sign-out-portal button:nth-child(1):hover {
+    border-color: white;
+    color: white;
 }
 
 #sign-out-portal button:nth-child(2) {
     opacity: 0;
     font-family: 'Bruno Ace SC', cursive;
+    font-weight: bold;
+    color: yellow;
     position: absolute;
     right: 15%;
     background-color: #fb2525;
@@ -641,6 +658,14 @@
     padding: 5px;
     text-align: center;
     font-size: 24px;
+    border: 3px yellow solid;
+    border-radius: 15px;
+    transition: .3s;
+}
+
+#sign-out-portal button:nth-child(2):hover {
+    border-color: white;
+    color: white;
 }
 
 #sign-out-x {

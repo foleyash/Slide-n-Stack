@@ -94,10 +94,6 @@ document.getElementById("score-info").addEventListener("mouseenter", openScoreTe
 
 document.getElementById("score-info").addEventListener("mouseleave", closeScoreTemplate);
 
-//initialize the game over and level up intervals
-var gameOverInterval;
-var levelUpInterval;
-
 //begin the lava wave animation
 let lavaInterval = window.setInterval(function() {
     if(wave_up) {
@@ -151,8 +147,6 @@ setPlatform(blockWidth, borderWidth);
 var moveInterval = window.setInterval(() => {
     movePlatform(blockWidth, windowWidth, borderWidth);
 }, gameSpeed);
-
-
 
 
 window.onresize = () => {
@@ -1580,49 +1574,97 @@ function openSignOutPortal() {
     X.style.display = "block";
     X.style.cursor = "pointer";
 
-    let iconContainer;
-    
-    if(loadScreen) {
-        iconContainer = document.getElementById("icon-container");
-        titleText.style.opacity = "0";
-    }
-    else {
-        iconContainer = document.getElementById("icon-container-game");
-        document.getElementById("score-container").getElementsByTagName('h1')[0].style.opacity = "0";
-        document.getElementById("score-container").getElementsByTagName('h1')[1].style.opacity = "0";
-    }
+    let iconContainer = document.getElementById("icon-container-game");
+    document.getElementById("score-container").getElementsByTagName('h1')[0].style.opacity = "0";
+    document.getElementById("score-container").getElementsByTagName('h1')[1].style.opacity = "0";
 
     for(let i = 0; i < iconContainer.children.length; i++) {
         iconContainer.children[i].style.opacity = "0";
     }
 
     setTimeout(function() {
-        portal.getElementsByTagName('h1')[0].style.opacity = "1";
-        
+        portal.getElementsByTagName('h1')[0].style.display = "block";
     }, 140);
 
     setTimeout(function() {
         portal.getElementsByTagName('div')[0].children[0].style.opacity = "1";
         portal.getElementsByTagName('div')[0].children[1].style.opacity = "1";
-    }, 220)
+    }, 220);
+
+    const yesButton = document.getElementById("sign-out-portal").getElementsByTagName('button')[0];
+    const noButton = document.getElementById("sign-out-portal").getElementsByTagName('button')[1];
+
+    yesButton.addEventListener("click", signOut);
+    yesButton.addEventListener("click", closeSignOutPortal);
+    noButton.addEventListener("click", closeSignOutPortal);
 
     X.addEventListener("click", closeSignOutPortal);
     restartButton.removeEventListener("click", restartGame, false);
     instructions.removeEventListener("click", openInstructions, false);
     leaderboard.removeEventListener("click", openLeaderboard, false);
+    muteButton.removeEventListener("click", muteGame);
     restartButton.style.cursor = "auto";
     instructions.style.cursor = "auto";
     leaderboard.style.cursor = "auto";
+    muteButton.style.cursor = 'auto';
 
     //remove the event listener for key presses
-    if(!loadScreen) {
-        document.removeEventListener("keypress", onSpaceBar);
-    }
+    document.removeEventListener("keypress", onSpaceBar);
 
 }
 
 function closeSignOutPortal() {
+    playSound('exitButton');
+    unpause(blockWidth, windowWidth, borderWidth);
+    const portal = document.getElementById("sign-out-portal");
+    let X = document.getElementById("sign-out-x");
 
+    portal.style.height = "0vh";
+    portal.style.border = "none";
+
+    setTimeout(() => {
+        
+        const iconContainer = document.getElementById("icon-container-game");
+        document.getElementById("score-container").getElementsByTagName('h1')[0].style.opacity = "1";
+        document.getElementById("score-container").getElementsByTagName('h1')[1].style.opacity = "1";
+        
+        for(let i = 0; i < iconContainer.children.length; i++) {
+            iconContainer.children[i].style.opacity = "1";
+        }
+    }, 220);
+    
+    
+    setTimeout(function() {
+        portal.getElementsByTagName('h1')[0].style.display = "none";
+        X.style.display = "none";
+        X.style.cursor = "auto";
+    }, 220);
+
+    setTimeout(function() {
+        portal.getElementsByTagName('div')[0].children[0].style.opacity = "0";
+        portal.getElementsByTagName('div')[0].children[1].style.opacity = "0";
+    }, 50);
+
+    const yesButton = document.getElementById("sign-out-portal").getElementsByTagName('button')[0];
+    const noButton = document.getElementById("sign-out-portal").getElementsByTagName('button')[1];
+
+    yesButton.removeEventListener("click", signOut);
+    yesButton.removeEventListener("click", closeSignOutPortal);
+    noButton.removeEventListener("click", closeSignOutPortal);
+
+    X.removeEventListener("click", closeSignOutPortal);
+    restartButton.addEventListener("click", restartGame, false);
+    instructions.addEventListener("click", openInstructions, false);
+    leaderboard.addEventListener("click", openLeaderboard, false);
+    muteButton.addEventListener("click", muteGame);
+    restartButton.style.cursor = "pointer";
+    instructions.style.cursor = "pointer";
+    leaderboard.style.cursor = "pointer";
+    muteButton.style.cursor = 'pointer';
+
+
+    //re-add the event listener for key presses if not on the load screen still
+    document.addEventListener("keypress", onSpaceBar);
 }
 
 function populateUserData(user) {
@@ -1665,10 +1707,16 @@ function populateUserData(user) {
     iconContainer.appendChild(document.createElement('br'));
     let helloUser = document.createElement('h1');
     helloUser.innerHTML = `Hello, ${user.username}`;
+    helloUser.style.textAlign = "right";
+    helloUser.style.width = "fit-content";
     iconContainer.appendChild(helloUser);
 
     //change the grid template columns to accomodate the new icon
     iconContainer.style.gridTemplateColumns = "repeat(3, 33%)";
+    let muteButton = document.getElementById("mute-button");
+    let unmuteButton = document.getElementById("unmute-button");
+    muteButton.style.gridColumnStart = "2";
+    unmuteButton.style.gridColumnStart = "2";
 
     //add sign out button functionality
     let signOutButton = document.getElementById("sign-out-button");
@@ -1683,6 +1731,7 @@ function populateUserData(user) {
     instructions.addEventListener("click", openInstructions);
     restartButton = document.getElementById("restart-button");
     restartButton.addEventListener("click", restartGame);
+    muteButton.addEventListener("click", muteGame);
     }
     //set leaderboard text so that it is properly formatted
     setLeaderboardText();
@@ -2024,8 +2073,16 @@ function signOut() {
     //remove the user's data from the application and return them to the default (non-signed-in) state
     username = "";
     loggedIn = false;
-    highLevel = 1;
-    extraPlatforms = 0;
+    highLevel = level;
+    highPlatforms = extraPlatforms;
+
+    //alter the format of the icons to a 4x1
+    let iconContainer = document.getElementById("icon-container-game");
+    iconContainer.style.gridTemplateColumns = "repeat(4, 25%)";
+    let muteButton = document.getElementById("mute-button");
+    let unmuteButton = document.getElementById("unmute-button");
+    muteButton.style.gridColumnStart = "4";
+    unmuteButton.style.gridColumnStart = "4";
 
     let loginBox = document.getElementById("login-button-container");
     loginBox.children[0].remove();
