@@ -53,9 +53,7 @@ var loginButton2 = document.getElementById("login-button-container").getElements
 var closeLoginPortalButton = document.getElementById("login-portal").getElementsByTagName("a")[0];
 var closeRegisterPortalButton = document.getElementById("register-portal").getElementsByTagName("a")[0];
 
-var forgotPassButton = document.getElementById("login-portal").getElementsByTagName("a")[1];
-
-var signUpButton = document.getElementById("login-portal").getElementsByTagName("a")[2];
+var signUpButton = document.getElementById("login-portal").getElementsByTagName("a")[1];
 var signUpButton2 = document.getElementById("login-button-container").getElementsByTagName("a")[1];
 
 // **** EVENT LISTENERS BELOW ****
@@ -587,6 +585,7 @@ async function fallInterval(fallingBlocks, blockWidth, last) {
                     if(highLevel < level || (highLevel === level && highPlatforms <= platforms)) {
                         postScore()
                             .then((response) => {
+                                console.log(response);
                                 populateUserData(response)
                                 if(rememberMe) {
                                     storeUserData(response);
@@ -1370,7 +1369,9 @@ function gameFinished() {
         instructions.removeEventListener('click', openInstructions);
         leaderboard.removeEventListener('click', openLeaderboard);
         muteButton.removeEventListener('click', muteGame);
-        document.getElementById("sign-out-button").removeEventListener('click', openSignOutPortal);
+        if(loggedIn) {
+            document.getElementById("sign-out-button").removeEventListener('click', openSignOutPortal);
+        }
 
         document.getElementById("score-info").removeEventListener("mouseenter", openScoreTemplate);
 
@@ -1474,9 +1475,11 @@ function gameFinished() {
                         instructions.addEventListener('click', openInstructions);
                         muteButton = document.getElementById("mute-button");
                         muteButton.addEventListener('click', muteGame);
-                        let signOutButton = document.getElementById("sign-out-button");
-                        signOutButton.addEventListener('click', openSignOutPortal);
-
+                        if(loggedIn) {
+                            let signOutButton = document.getElementById("sign-out-button");
+                            signOutButton.addEventListener('click', openSignOutPortal);
+                        }
+                        
                         for(let i = 0; i < scoreContainer.children.length; i++) {
                             scoreContainer.children[i].style.opacity = "1";
                         }
@@ -1859,6 +1862,7 @@ async function attemptRegister(e) {
     // add the user's information to the web browser and send a cookie so that their information may be stored
         username = user_name;
         loggedIn = true;
+        getTopScores();
         populateUserData(data);
         closeRegisterPortal();
         
@@ -1988,6 +1992,27 @@ async function getTopScores() {
             container.appendChild(levelDiv);
             container.appendChild(extraBlocksDiv);
             document.getElementById("top-scores").appendChild(container);
+        }
+
+        if(scores.length < 25) {
+            for(let i = scores.length; i < 25; i++) {
+                const container = document.createElement('div');
+                container.classList.add("leaderboard-stats-container");
+                const rankDiv = document.createElement('div');
+                rankDiv.textContent = `${i + 1}`;
+                const gamertagDiv = document.createElement('div');
+                gamertagDiv.textContent = `???`;
+                const levelDiv = document.createElement('div');
+                levelDiv.textContent = `???`;
+                const extraBlocksDiv = document.createElement('div');
+                extraBlocksDiv.textContent = `???`;
+
+                container.appendChild(rankDiv);
+                container.appendChild(gamertagDiv);
+                container.appendChild(levelDiv);
+                container.appendChild(extraBlocksDiv);
+                document.getElementById("top-scores").appendChild(container);
+            }
         }
     }
     else if (data.status === 500) {

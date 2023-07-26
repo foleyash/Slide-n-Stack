@@ -71,7 +71,7 @@ app.post('/api/authenticate', async (req, res) => {
 
     const user_name = await database.getUserName(id, database.pool);
     const user = await database.getUserInformation(id, database.pool);
-    const hashedPassword = await database.getUserPass(req.body.username, database.pool);
+    const hashedPassword = await database.getUserPass(id, database.pool);
     
     bcrypt.compare(req.body.password, hashedPassword, function(err, result) {
         if(result) {
