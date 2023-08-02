@@ -585,7 +585,6 @@ async function fallInterval(fallingBlocks, blockWidth, last) {
                     if(highLevel < level || (highLevel === level && highPlatforms <= platforms)) {
                         postScore()
                             .then((response) => {
-                                console.log(response);
                                 populateUserData(response)
                                 if(rememberMe) {
                                     storeUserData(response);

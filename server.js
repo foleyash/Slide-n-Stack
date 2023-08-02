@@ -1,9 +1,9 @@
 
-import express from 'express'
+import express from 'express';
 import * as database from './database.js';
 import bcrypt from 'bcrypt';
 
-const app = express()
+const app = express();
 
 app.use(express.static('public'));
 app.use(express.json({limit: '10mb'}));
@@ -166,4 +166,4 @@ app.post('/api/userData', async (req, res) => {
 });
 
 
-app.listen(3000)
+app.listen(8080)

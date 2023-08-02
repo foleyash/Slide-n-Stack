@@ -797,7 +797,7 @@
         }
 
         #leaderboard-title {
-            margin-top: 7%;
+            margin-top: 3%;
         }
 
         #sign-out-portal h1 {
@@ -835,7 +835,7 @@
     }
 
     #leaderboard-title {
-        margin-top: 10%;
+        margin-top: 5%;
     }
 
     #icon-container {
@@ -887,8 +887,8 @@
     }
 
     #new-high-score {
-        width: 120px;
-        margin-left:-60px;
+        width: 200px;
+        margin-left:-100px;
     }
     #new-high-score h1 {
         font-size: 36px;
@@ -1121,7 +1121,7 @@
     }
 
     #leaderboard-title {
-        margin-top: 15%;
+        margin-top: 7%;
     }
 
     #login-portal {
@@ -1276,7 +1276,7 @@
     }
 
     #leaderboard-title {
-        margin-top: 20%;
+        margin-top: 10%;
         font-size: 14px;
     }
 
