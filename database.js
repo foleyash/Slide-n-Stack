@@ -161,7 +161,6 @@ export async function updatePlacements(user_id, users, placement, level, platfor
                                       WHERE placement < ? AND (high_level < ? OR (high_level = ? 
                                       AND extra_platforms < ?))`,
                                       [placement, level, level, platforms]);
-    console.log(numUsers[0][0].numUsers);
     //if the number of users that are surpassed is > 0, update the placements of the users that are surpassed
     // and of the acting user
 
@@ -183,65 +182,10 @@ export async function updatePlacements(user_id, users, placement, level, platfor
         return newPlacement;
     }
     else return placement;
-
-    
-/*
-    //find the next best placement within the users array
-    let nextBest = placement;
-
-    for(let i = 0; i < users.length; i++) {
-        const id = users[i].user_id;
-        if(id === user_id) continue;
-        const userInfo = await getUserInformation(id, pool);
-        const currPlacement = userInfo.placement;
-        const currLevel = userInfo.high_level;
-        const currPlatforms = userInfo.extra_platforms;  
-    
-        if(currPlacement < nextBest && (currLevel < level || (currLevel === level && currPlatforms < platforms))) {
-            nextBest = currPlacement;
-        }
-    }
-
-    console.log(nextBest + " " + placement);
-
-    //if the next best placement is the same as the user's current placement, return the user's current placement
-    if(nextBest === placement) return placement;
-
-    //update the user's placement based on the next best placement
-    await pool.query(`UPDATE users
-    SET placement = ?
-    WHERE user_id = ?`, [(nextBest - 1), user_id]);
-
-    return nextBest - 1;
-    */
 }
-
-/* Additional functions to create:
-
-    updateUserInfo - change placement, high_level, and extra_platforms for user w/ user_id.
-    this should also update all placements of the users with lower scores by incrementing them by 1
-
     
-*/
 
-//const topScores = await getBestScores(loginInfo);
- 
- /*const loginInfo = await getLoginInformation(pool);
-const topScores = await getBestScores(loginInfo, pool);
-console.log(topScores); test("123", pool).then((user) => console.log(user));
-if(await doesUserExist("123", pool)) console.log("user exists");
-else console.log("user does not exist"); */
 
-async function test(user_id, pool) {
-    const currLevel = await pool.query(`SELECT high_level FROM users WHERE user_id = ?`, [user_id]);
-    const currPlatforms = await pool.query(`SELECT extra_platforms FROM users WHERE user_id = ?`, [user_id]);
-    const currPlacement = await pool.query(`SELECT placement FROM users WHERE user_id = ?`, [user_id]);
 
-    console.log(currLevel[0][0].high_level);
-    console.log(currPlatforms[0][0].extra_platforms);
-    console.log(currPlacement[0][0].placement);
-}
-
-//test(50, pool);
 
 

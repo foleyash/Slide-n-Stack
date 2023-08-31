@@ -81,14 +81,24 @@
     width: 300px;
     height: fit-content;
     position: absolute;
-    right:-25%;
     top:20vh;
-    transition: .5s;
     z-index: 8;
     display:grid;
     grid-template-columns: repeat(4, 25%);
     gap: 10px;
     text-align: center;
+}
+
+.icon-container-game-inactive {
+    position: absolute;
+    right: -25%;
+    transition: .5s;
+}
+
+.icon-container-game-active {
+    position: absolute;
+    right: 10%;
+    transition: 1s ease-in-out;
 }
 
 #icon-container-game i {
@@ -944,6 +954,10 @@
         font-size: 14px;
     }
 
+    .checkbox {
+        font-size: 14px;
+    }
+
     #login-portal input::placeholder {
         font-size: 16px;
     }
@@ -1104,6 +1118,10 @@
         width: 120px;
     }
 
+    .icon-container-game-active {
+        right: 15%;
+    }
+
     #icon-container-game i {
         font-size: 24px;
     }
@@ -1144,6 +1162,10 @@
     }
 
     #login-portal input[type="text"], input[type="password"] {
+        font-size: 12px;
+    }
+
+    .checkbox {
         font-size: 12px;
     }
 
@@ -1276,7 +1298,7 @@
     }
 
     #leaderboard-title {
-        margin-top: 10%;
+        margin-top: 18%;
         font-size: 14px;
     }
 
@@ -1309,7 +1331,7 @@
     }
 
     #icon-container-game i {
-        font-size: 16px;
+        font-size: 18px;
     }
 
     #icon-container-game h1 {
@@ -1341,6 +1363,10 @@
     }
 
     #login-portal input[type="text"], input[type="password"] {
+        font-size: 9px;
+    }
+
+    .checkbox {
         font-size: 9px;
     }
 

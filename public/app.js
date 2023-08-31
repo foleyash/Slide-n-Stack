@@ -265,12 +265,36 @@ function onSpaceBar(e) {
         e.key == " "
         ) {
         
+        document.removeEventListener("keypress", onSpaceBar);
+        document.removeEventListener("touchstart", onTouchStart, false);
         dropPlatform(firstBlock, blockWidth);
         if(firstBlock) {
             firstBlock = false;
         }
         
+        document.addEventListener("keypress", onSpaceBar);
+        document.addEventListener("touchstart", onTouchStart, false);
     }
+}
+
+function onTouchStart(e) {
+    [...e.targetTouches].forEach((touch) => {
+        if(touch.clientX < windowWidth - borderWidth && touch.clientX > borderWidth
+            && touch.clientY > (document.getElementById("score-container").getElementsByTagName('h1')[1].getBoundingClientRect().bottom + 5)
+            && touch.clientY <  floor.getBoundingClientRect().top) {
+            document.removeEventListener("keypress", onSpaceBar);
+            document.removeEventListener("touchstart", onTouchStart, false);
+
+            dropPlatform(firstBlock, blockWidth);
+            if(firstBlock) {
+                firstBlock = false;
+            }
+
+            document.addEventListener("keypress", onSpaceBar);
+            document.addEventListener("touchstart", onTouchStart, false);
+            return;
+        }
+    });
 }
 
 function setPlatform(blockWidth, borderWidth) {
@@ -840,8 +864,7 @@ function startGame() {
     leaderboard.style.opacity = "0";
     scoreContainer.style.transition = "1s ease-in-out";
     scoreContainer.style.left = "5%";
-    iconContainer.style.transition = "1s ease-in-out";
-    iconContainer.style.right = "10%";
+    iconContainer.classList.replace("icon-container-game-inactive", "icon-container-game-active");
 
     for(let i = 0; i < scores.length; i++) {
         scores[i].style.transition = "2s";
@@ -873,7 +896,7 @@ function startGame() {
     navBar.style.transition = ".7s ease-in-out"
     navBar.style.top = "0";
     titleText.style.transition = "1s ease-in-out";
-    titleText.style.top = "3vh";
+    titleText.style.top = "30%";
     
     setTimeout(function() {
         titleText.style.transition = "0s";
@@ -902,6 +925,8 @@ function startGame() {
 
     //add the event listener for the space bar to drop platforms
     document.addEventListener("keypress", onSpaceBar);
+
+    document.addEventListener("touchstart", onTouchStart, false);
     
 }
 
@@ -955,6 +980,12 @@ function openInstructions() {
     instructions.style.cursor = "auto";
     leaderboard.style.cursor = "auto";
 
+    //remove the event listener for key presses
+    if(!loadScreen && !gameOver) {
+        document.removeEventListener("keypress", onSpaceBar);
+        document.removeEventListener("touchstart", onTouchStart, false);
+    }
+
 }
 
 function closeInstructions() {
@@ -1004,6 +1035,12 @@ function closeInstructions() {
     restartButton.style.cursor = "pointer";
     instructions.style.cursor = "pointer";
     leaderboard.style.cursor = "pointer";
+
+    //re-add the event listener for key presses
+    if(!loadScreen && !gameOver) {
+        document.addEventListener("keypress", onSpaceBar);
+        document.addEventListener("touchstart", onTouchStart, false);
+    }
 }
 
 function openLeaderboard() {
@@ -1057,8 +1094,9 @@ function openLeaderboard() {
     }
 
     //remove the event listener for key presses
-    if(!loadScreen) {
+    if(!loadScreen && !gameOver) {
         document.removeEventListener("keypress", onSpaceBar);
+        document.removeEventListener("touchstart", onTouchStart, false);
     }
 
 }
@@ -1119,8 +1157,9 @@ function closeLeaderboard() {
     leaderboard.style.cursor = "pointer";
 
     //re-add the event listener for key presses
-    if(!loadScreen) {
+    if(!loadScreen && !gameOver) {
         document.addEventListener("keypress", onSpaceBar);
+        document.addEventListener("touchstart", onTouchStart, false);
     }
     
 }
@@ -1230,6 +1269,7 @@ function restartGame() {
     unpause(blockWidth, windowWidth, borderWidth);
 
     document.addEventListener("keypress", onSpaceBar);
+    document.addEventListener("touchstart", onTouchStart, false);
     
 }
 
@@ -1249,10 +1289,10 @@ function openScoreTemplate() {
         div.style.height = "18px";
         
         if(windowWidth < 400) {
-            div.style.fontSize = "8px";
+            div.style.fontSize = "6px";
         }
         else if(windowWidth < 600) {
-            div.style.fontSize = "10px";
+            div.style.fontSize = "8px";
         }
         else {
             div.style.fontSize = "12px";
@@ -1322,6 +1362,11 @@ function closeScoreTemplate() {
 //MODIFIES: platforms, backgroundColor
 //EFFECTS: The UI of the game turns into a gameover screen prompting the user to play again with information about their score
 function gameFinished() {
+
+    //remove the event listeners for dropping platforms
+    document.removeEventListener("keypress", onSpaceBar);
+    document.removeEventListener("touchstart", onTouchStart, false);
+
     gameOver = true;
     //Grab the counter variables for the platform submerging interval
     let numPlatforms = platforms.length;
@@ -1612,6 +1657,7 @@ function openSignOutPortal() {
 
     //remove the event listener for key presses
     document.removeEventListener("keypress", onSpaceBar);
+    document.addEventListener("touchstart", onTouchStart, false);
 
 }
 
@@ -1667,6 +1713,7 @@ function closeSignOutPortal() {
 
     //re-add the event listener for key presses if not on the load screen still
     document.addEventListener("keypress", onSpaceBar);
+    document.addEventListener("touchstart", onTouchStart, false);
 }
 
 function populateUserData(user) {
@@ -1737,10 +1784,6 @@ function populateUserData(user) {
     }
     //set leaderboard text so that it is properly formatted
     setLeaderboardText();
-
-}
-
-function setIcons() {
 
 }
 
@@ -2102,7 +2145,12 @@ function signOut() {
 
     //alter the format of the icons to a 4x1
     let iconContainer = document.getElementById("icon-container-game");
-    iconContainer.style.gridTemplateColumns = "repeat(4, 25%)";
+    if(getWindowWidth() < 575) {
+        iconContainer.style.gridTemplateColumns = "repeat(2, 50%)";
+    }
+    else {
+        iconContainer.style.gridTemplateColumns = "repeat(4, 25%)";
+    }
     let muteButton = document.getElementById("mute-button");
     let unmuteButton = document.getElementById("unmute-button");
     muteButton.style.gridColumnStart = "4";
@@ -2171,35 +2219,4 @@ function px2num (str) {
     let num = Number(ans);
 
     return num;
-}
-
-//TESTING FUNCTIONS BELOW ****
-
-function setTestBlocks() {
-    let testBlocks = document.getElementById("test-blocks");
-    let blocks = blocksInWindow();
-    let width = blocks * getChildWidth();
-    let borderWidth = (getWindowWidth() - width) / 2;
-    
-    testBlocks.style.height = getChildWidth() + "px";
-    testBlocks.style.width = width + "px";
-    testBlocks.style.left = borderWidth + "px";
-}
-
-function fillTestBlocks() {
-
-    let testBlocks = document.getElementById("test-blocks");
-    let blocks = blocksInWindow();
-
-    if(testBlocks.hasChildNodes()) {
-        while(testBlocks.firstChild) {
-            testBlocks.removeChild(testBlocks.lastChild);
-        }
-    }
-    
-    for(let i = 0; i < blocks; i++) {
-        let div = document.createElement('div');
-        div.classList.add('child');
-        testBlocks.appendChild(div);
-    }
 }
