@@ -33,6 +33,7 @@ var gameOver = false;
 var newHighScore = false;
 var loadScreen = true;
 var mute = false;
+var canDrop = false;
 
 setLeaderboardText();
 
@@ -260,38 +261,39 @@ function onSpaceBar(e) {
 
     e.preventDefault();
 
+    if(!canDrop) return;
+
     if(e.keycode == 32 ||
         e.code == "Space" ||
         e.key == " "
         ) {
         
-        document.removeEventListener("keypress", onSpaceBar);
-        document.removeEventListener("touchstart", onTouchStart, false);
+        canDrop = false;
         dropPlatform(firstBlock, blockWidth);
+
         if(firstBlock) {
             firstBlock = false;
         }
         
-        document.addEventListener("keypress", onSpaceBar);
-        document.addEventListener("touchstart", onTouchStart, false);
     }
 }
 
 function onTouchStart(e) {
+
+    if(!canDrop) return;
+
     [...e.targetTouches].forEach((touch) => {
         if(touch.clientX < windowWidth - borderWidth && touch.clientX > borderWidth
             && touch.clientY > (document.getElementById("score-container").getElementsByTagName('h1')[1].getBoundingClientRect().bottom + 5)
             && touch.clientY <  floor.getBoundingClientRect().top) {
-            document.removeEventListener("keypress", onSpaceBar);
-            document.removeEventListener("touchstart", onTouchStart, false);
-
-            dropPlatform(firstBlock, blockWidth);
+            
+            canDrop = false;
+            dropPlatform(firstBlock, blockWidth)
+        
             if(firstBlock) {
                 firstBlock = false;
             }
 
-            document.addEventListener("keypress", onSpaceBar);
-            document.addEventListener("touchstart", onTouchStart, false);
             return;
         }
     });
@@ -375,7 +377,9 @@ function movePlatform(blockWidth, windowWidth, borderWidth) {
 
 async function dropPlatform(firstBlock, blockWidth) {
 
+    //pLay the move sound effect
     playSound('move');
+    pause();
     let last = false;
     let pos = px2num(platforms[platforms.length - 1].style.left); 
     let top = px2num(platforms[platforms.length - 1].style.top);
@@ -391,6 +395,7 @@ async function dropPlatform(firstBlock, blockWidth) {
         }
         else {
             setPlatform(blockWidth, borderWidth);
+            unpause(blockWidth, windowWidth, borderWidth);
         }
         
         updateScore();
@@ -516,7 +521,6 @@ async function dropPlatform(firstBlock, blockWidth) {
 async function fallInterval(fallingBlocks, blockWidth, last) {
 
     let count = 0;
-    pause();
     let interval = window.setInterval(() => {
 
         let allDown = true;
@@ -925,9 +929,8 @@ function startGame() {
 
     //add the event listener for the space bar to drop platforms
     document.addEventListener("keypress", onSpaceBar);
-
     document.addEventListener("touchstart", onTouchStart, false);
-    
+    canDrop = true;
 }
 
 function openInstructions() {
@@ -980,18 +983,11 @@ function openInstructions() {
     instructions.style.cursor = "auto";
     leaderboard.style.cursor = "auto";
 
-    //remove the event listener for key presses
-    if(!loadScreen && !gameOver) {
-        document.removeEventListener("keypress", onSpaceBar);
-        document.removeEventListener("touchstart", onTouchStart, false);
-    }
-
 }
 
 function closeInstructions() {
     playSound('exitButton');
     unpause(blockWidth, windowWidth, borderWidth);
-    if(loadScreen) paused = true;
     
     let background = document.getElementById("instructions");
     let textBox = document.getElementById("textBox");
@@ -1036,11 +1032,6 @@ function closeInstructions() {
     instructions.style.cursor = "pointer";
     leaderboard.style.cursor = "pointer";
 
-    //re-add the event listener for key presses
-    if(!loadScreen && !gameOver) {
-        document.addEventListener("keypress", onSpaceBar);
-        document.addEventListener("touchstart", onTouchStart, false);
-    }
 }
 
 function openLeaderboard() {
@@ -1093,7 +1084,7 @@ function openLeaderboard() {
         openLoginPortal();
     }
 
-    //remove the event listener for key presses
+    //remove the event listener for key presses so that they do not interfere with the leaderboard inputs
     if(!loadScreen && !gameOver) {
         document.removeEventListener("keypress", onSpaceBar);
         document.removeEventListener("touchstart", onTouchStart, false);
@@ -1107,7 +1098,6 @@ function closeLeaderboard() {
     if (!gameOver) {unpause(blockWidth, windowWidth, borderWidth);}
 
     if(loadScreen) {
-        paused = true;
         iconContainer = document.getElementById("icon-container");
         setTimeout(function() {
             titleText.style.opacity = "1";
@@ -2186,11 +2176,12 @@ function playSound(soundName) {
     if(!mute) sfx[soundName].play();
 }
 
-//EFFECTS: Stops the moveInterval which pauses the game
+//EFFECTS: Stops the moveInterval which pauses the game and prevents user from dropping blocks
 function pause() {
     
     clearInterval(moveInterval); 
     paused = true;
+    canDrop = false;
 
 }
 
@@ -2200,7 +2191,8 @@ function unpause(blockWidth, windowWidth, borderWidth) {
         moveInterval = window.setInterval(() => {
             movePlatform(blockWidth, windowWidth, borderWidth);
         }, gameSpeed);
-        paused = false;     
+        paused = false;  
+        canDrop = true;   
 
 }
 
