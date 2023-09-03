@@ -26,6 +26,10 @@ var platforms = [base];
 var colorPercent = 20;
 var colors = ['rgb(80, 14, 14)', 'rgb(230, 39, 39)', 'rgb(95, 185, 21)', 'rgb(11, 109, 238)', 'rgb(106, 31, 150)', 'rgb(42, 18, 65)', 'rgb(12, 11, 11)']
 
+var gameOverInterval;
+var levelUpInterval;
+
+// *** STATE CONTROL VARIABLES BELOW ***
 var moveRight = true;
 var paused = false;
 var firstBlock = true;
@@ -34,7 +38,9 @@ var newHighScore = false;
 var loadScreen = true;
 var mute = false;
 var canDrop = false;
+var intervalInProgress = false;
 
+//Initialize the state of the leaderboard text based on the window size
 setLeaderboardText();
 
 //user authentication local variables
@@ -757,6 +763,7 @@ function levelUp() {
     
     levelUpInterval = window.setInterval(() => {
 
+        intervalInProgress = true;
         if(counter === 6) {
             clearInterval(levelUpInterval);
         }
@@ -788,12 +795,14 @@ function levelUp() {
         setTimeout(addBlock, 2800)
         setTimeout(() => {
             setPlatform(blockWidth, borderWidth);
+            intervalInProgress = false;
             unpause(blockWidth, windowWidth, borderWidth); 
         }, 4200);
     }
     else {
         setTimeout(() => {
             setPlatform(blockWidth, borderWidth);
+            intervalInProgress = false;
             unpause(blockWidth, windowWidth, borderWidth); 
         }, 2800);
     }
@@ -1214,6 +1223,8 @@ function restartGame() {
         playSound('gameMusic');
     }
     pause();
+    clearInterval(levelUpInterval);
+    clearInterval(gameOverInterval);
     level = 1;
     extraPlatforms = 0;
     gameSpeed = 150;
@@ -1380,8 +1391,11 @@ function gameFinished() {
     //show the stack of platforms becoming covered by lava one by one
     gameOverInterval = window.setInterval(() => {
 
+        intervalInProgress = true;
+
         if(counter === numPlatforms) {
             clearInterval(gameOverInterval);
+            intervalInProgress = false;
             return;
         }
 
@@ -2187,7 +2201,9 @@ function pause() {
 
 //EFFECTS: Activates the moveInterval with gameSpeed frequency which unpauses the game
 function unpause(blockWidth, windowWidth, borderWidth) {
-    
+
+    if(intervalInProgress) {return;}
+    clearInterval(moveInterval);
         moveInterval = window.setInterval(() => {
             movePlatform(blockWidth, windowWidth, borderWidth);
         }, gameSpeed);
