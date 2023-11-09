@@ -9,6 +9,37 @@ var instructions = document.getElementById("instructions-start");
 var leaderboard = document.getElementById("leaderboard-start");
 var restartButton = document.getElementById("restart-button");
 var muteButton = document.getElementById("mute-button");
+var sfx = {
+    break: new Howl({
+       src: ['audio/break.wav'],
+       volume: 0.5
+    }),
+    splash: new Howl({
+       src: ['audio/splash.wav'], 
+       volume: 0.7
+    }),
+    addBlock: new Howl({
+       src: ['audio/addBlock.wav'],
+       volume: 0.5
+    }),
+    button: new Howl({
+       src: ['audio/button.mp3'],
+       volume: 0.8
+    }),
+    exitButton: new Howl({
+       src: ['audio/exitButton.mp3'],
+       volume: 0.8
+    }),
+    move: new Howl({
+       src: ['audio/move.wav'],
+       volume: 0.5
+    }), 
+    gameMusic: new Howl({
+       src: ['audio/preGameMusic.mp3'],
+       volume: 0.5,
+       loop: true
+    }),
+}
 
 //hide overflow in the window
 document.body.style.overflow = "hidden";
@@ -1759,7 +1790,7 @@ function populateUserData(user) {
     iconContainer.innerHTML = newHTML;
     iconContainer.appendChild(document.createElement('br'));
     let helloUser = document.createElement('h1');
-    helloUser.innerHTML = `Hello, ${user.username}`;
+    helloUser.textContent = `Hello, ${user.username}`;
     helloUser.style.textAlign = "right";
     helloUser.style.width = "fit-content";
     iconContainer.appendChild(helloUser);

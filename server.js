@@ -5,6 +5,18 @@ import bcrypt from 'bcrypt';
 
 const app = express();
 
+// CSP is a good idea if you're not using a front end framework
+app.use((req, res, next) => {
+    res.setHeader(
+        'Content-Security-Policy', 
+        `default-src \'self\' https:; 
+        style-src \'self\' \'unsafe-inline\' https:; 
+        script-src \'self\' https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js https://kit.fontawesome.com/7701dbaa82.js; 
+        frame-ancestors \'none\'; 
+        form-action \'none\';`.replace(/\s{2,}/g, ' ').trim()
+    );
+    next();
+});
 app.use(express.static('public'));
 app.use(express.json({limit: '10mb'}));
 
